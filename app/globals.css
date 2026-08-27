@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+/* Cool-slate neutrals with a broadcast tally-red accent. Channels carry their
+   own hue so a three-channel day reads at a glance. */
+:root {
+  --paper: #eaedf1;
+  --surface: #fbfcfd;
+  --surface-2: #f1f3f6;
+  --ink: #161a21;
+  --ink-2: #3c4450;
+  --ink-3: #6b7482;
+  --rule: #cfd5dd;
+  --rule-soft: #dfe4ea;
+  --tally: #d1361f;
+  --good: #1f7a5c;
+  --warn: #b06f14;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #101318;
+    --surface: #181d25;
+    --surface-2: #1f252e;
+    --ink: #e6eaef;
+    --ink-2: #b3bcc8;
+    --ink-3: #828d9b;
+    --rule: #333c48;
+    --rule-soft: #272f3a;
+    --tally: #f4614a;
+    --good: #4fbe97;
+    --warn: #e0a244;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-surface2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink2: var(--ink-2);
+  --color-ink3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-rulesoft: var(--rule-soft);
+  --color-tally: var(--tally);
+  --color-good: var(--good);
+  --color-warn: var(--warn);
+  --font-sans: "Archivo", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .label {
+    @apply font-mono text-[0.62rem] font-bold uppercase tracking-[0.12em] text-ink3;
+  }
+  .card {
+    @apply rounded-sm border border-rulesoft bg-surface;
+  }
+  .btn {
+    @apply inline-flex cursor-pointer items-center gap-1.5 rounded-sm border border-rule
+           bg-surface px-2.5 py-1.5 font-mono text-[0.68rem] font-bold uppercase
+           tracking-[0.08em] text-ink2 transition-colors hover:bg-surface2
+           hover:text-ink disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply border-transparent bg-[var(--tally)] text-white hover:bg-[var(--tally)] hover:opacity-90 hover:text-white;
+  }
+  .input {
+    @apply w-full rounded-sm border border-rule bg-surface px-2.5 py-1.5 text-sm
+           text-ink outline-none placeholder:text-ink3 focus:border-[var(--tally)];
+  }
+  .chip {
+    @apply inline-flex items-center rounded-sm px-1.5 py-0.5 font-mono text-[0.6rem]
+           font-bold uppercase tracking-[0.06em] text-white;
+  }
+  .field {
+    @apply flex flex-col gap-1.5;
+  }
+  .prose-script {
+    @apply whitespace-pre-wrap text-sm leading-relaxed text-ink2;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--tally);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
