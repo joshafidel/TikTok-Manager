@@ -1,17 +1,29 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
 
+/**
+ * A deployed instance needs a password and a hosted database. Missing either
+ * one is a misconfiguration, not a runtime error, so catch it here rather than
+ * letting every page fail its own way.
+ */
+function misconfigured(): boolean {
+  if (process.env.NODE_ENV !== "production") return false;
+  const url = process.env.DATABASE_URL;
+  return !process.env.APP_PASSWORD || !url || url.startsWith("file:");
+}
+
 export async function middleware(req: NextRequest) {
-  const password = process.env.APP_PASSWORD;
   const { pathname, search } = req.nextUrl;
 
-  // No password configured. Fine on a laptop; never in production — a deployed
-  // instance with no gate exposes the content and the API key to anyone.
-  if (!password) {
-    if (process.env.NODE_ENV !== "production") return NextResponse.next();
+  if (misconfigured()) {
     if (pathname === "/locked") return NextResponse.next();
     return NextResponse.redirect(new URL("/locked", req.url));
   }
+
+  const password = process.env.APP_PASSWORD;
+  // Locally, with no password set, the app runs open — a login screen would
+  // just be in the way on your own laptop.
+  if (!password) return NextResponse.next();
 
   if (pathname === "/login") return NextResponse.next();
 
@@ -25,6 +37,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  // Everything except Next internals, the icon routes and the manifest.
   matcher: ["/((?!_next/static|_next/image|favicon.ico|icon|apple-icon|manifest.webmanifest).*)"],
 };

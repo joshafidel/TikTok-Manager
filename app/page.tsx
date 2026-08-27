@@ -9,13 +9,9 @@ export const dynamic = "force-dynamic";
 export default async function TodayPage() {
   const today = todayISO();
 
-  let channels: Channel[];
-  try {
-    channels = await getChannels();
-  } catch {
-    return <SetupNotice />;
-  }
-  if (!channels.length) return <SetupNotice />;
+  // The app creates its tables and seeds channels on first use, so an empty
+  // database is not a state that needs handling here.
+  const channels: Channel[] = await getChannels();
 
   const [{ recording, posting }, depths, upcoming] = await Promise.all([
     getDay(today),
@@ -153,23 +149,6 @@ export default async function TodayPage() {
           )}
         </div>
       </section>
-    </div>
-  );
-}
-
-function SetupNotice() {
-  return (
-    <div className="card mx-auto mt-12 max-w-lg p-6">
-      <p className="label !text-[var(--tally)]">Setup</p>
-      <h1 className="mt-2 text-xl font-bold tracking-tight">The database isn&apos;t ready yet</h1>
-      <p className="mt-3 text-sm text-ink2">Run these once, then reload:</p>
-      <pre className="mt-3 overflow-x-auto rounded-sm border border-rulesoft bg-surface2 p-3 font-mono text-xs">
-        npm run db:migrate{"\n"}npm run db:seed
-      </pre>
-      <p className="mt-3 text-sm text-ink2">
-        That creates <code className="font-mono text-xs">data/app.db</code> and loads your three
-        channel profiles.
-      </p>
     </div>
   );
 }
