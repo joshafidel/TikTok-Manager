@@ -356,3 +356,14 @@ export async function scriptFormAction(
 ): Promise<ActionResult> {
   return runScriptGeneration(fd);
 }
+
+/* -------------------------------------------------------------------------- */
+/* Session                                                                    */
+/* -------------------------------------------------------------------------- */
+
+export async function signOut() {
+  const { cookies } = await import("next/headers");
+  const { SESSION_COOKIE } = await import("./auth");
+  (await cookies()).delete(SESSION_COOKIE);
+  redirect("/login");
+}

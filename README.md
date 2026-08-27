@@ -103,19 +103,71 @@ If you later want posting in-app, the realistic path is the Upload flow
 (drops a video into your TikTok inbox as a draft, you finish it in the app),
 or self-hosting Postiz and inheriting its API access.
 
-## Running it on your phone
+## Getting it on your phone
 
-You will check "what do I post today" on your phone. The UI is responsive; the
-default SQLite file is not. Point `DATABASE_URL` at a [Turso](https://turso.tech)
-database and set `DATABASE_AUTH_TOKEN` — the libsql client is the same either
-way — then deploy to Railway or Vercel.
+The app is a responsive web app, so "on your phone" means deploying it and
+adding it to your home screen. It ships a web manifest and icons, so it opens
+standalone without browser chrome.
+
+### 1. A database that survives
+
+Vercel's filesystem is ephemeral — a SQLite file would be wiped on every
+deploy. Use [Turso](https://turso.tech), which speaks the same libsql protocol,
+so no code changes are needed:
+
+```bash
+curl -sSfL https://get.tur.so/install.sh | bash
+turso auth signup
+turso db create tiktok-manager
+turso db show tiktok-manager --url        # -> DATABASE_URL
+turso db tokens create tiktok-manager     # -> DATABASE_AUTH_TOKEN
+```
+
+Then point your local env at it once and push the schema up:
+
+```bash
+DATABASE_URL=libsql://... DATABASE_AUTH_TOKEN=... npm run db:migrate
+DATABASE_URL=libsql://... DATABASE_AUTH_TOKEN=... npm run db:seed
+```
+
+### 2. Deploy
+
+Import the repo at [vercel.com/new](https://vercel.com/new) and set four
+environment variables (Project → Settings → Environment Variables):
+
+| Variable | Value |
+|---|---|
+| `ANTHROPIC_API_KEY` | Your key from [console.anthropic.com](https://console.anthropic.com) |
+| `APP_PASSWORD` | Any long random string — this is your login |
+| `DATABASE_URL` | `libsql://...` from Turso |
+| `DATABASE_AUTH_TOKEN` | The Turso token |
+
+Everything else is default. Framework detection picks up Next.js on its own.
+
+### 3. Add to home screen
+
+Open the deployed URL on your phone, sign in, then Share → **Add to Home
+Screen** (iOS) or menu → **Install app** (Android). The session cookie lasts 30
+days, so you sign in about once a month.
+
+### Notes
+
+- **The password gate is not optional.** A deployed instance with no
+  `APP_PASSWORD` refuses to serve at all, because an open URL would expose your
+  content and let anyone spend your Anthropic credit.
+- Script generation runs adaptive thinking at high effort and can take a couple
+  of minutes. The generation pages set `maxDuration = 300`, which Vercel's Hobby
+  plan allows under Fluid Compute (on by default).
+- If you'd rather not deploy at all, run `npm run dev` on your laptop and reach
+  it from your phone over the local network or Tailscale. No hosting, no
+  password needed — but the laptop has to be awake.
 
 ## Stack
 
 Next.js 15 (App Router, server actions), TypeScript, Drizzle ORM over
 libsql/SQLite, Tailwind v4, `@anthropic-ai/sdk`.
 
-Single user by design. Don't make it multi-tenant.
+Single user by design — one password, one operator. Don't make it multi-tenant.
 
 ## Scripts
 

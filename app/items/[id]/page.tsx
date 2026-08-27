@@ -7,6 +7,8 @@ import { ChannelChip, SectionHead, StatusPill, StatusSelect } from "@/components
 import { STATUSES } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
+// Script generation runs adaptive thinking at high effort — well past a default timeout.
+export const maxDuration = 300;
 
 export default async function ItemPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

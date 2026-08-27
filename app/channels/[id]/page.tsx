@@ -7,6 +7,8 @@ import { ChannelChip, DepthMeter, Empty, SectionHead, StatusPill } from "@/compo
 import { DAY_ABBR } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
+// Script generation runs adaptive thinking at high effort — well past a default timeout.
+export const maxDuration = 300;
 
 export default async function ChannelPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
