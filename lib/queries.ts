@@ -2,16 +2,19 @@ import "server-only";
 import { and, desc, eq, gte, inArray, lte, ne, or, sql } from "drizzle-orm";
 import { db, channels, items, clips, performance } from "@/db";
 import type { Channel, Item, Status } from "@/db/schema";
+import { ready } from "@/db/ready";
 import type { ISODate } from "./dates";
 
 /** Statuses that count as a banked, ready-to-post video. */
 export const READY_STATUSES: Status[] = ["edited", "scheduled"];
 
 export async function getChannels(): Promise<Channel[]> {
+  await ready();
   return db.select().from(channels).orderBy(channels.sortOrder);
 }
 
 export async function getChannel(id: string): Promise<Channel | undefined> {
+  await ready();
   const [row] = await db.select().from(channels).where(eq(channels.id, id));
   return row;
 }
@@ -19,12 +22,14 @@ export async function getChannel(id: string): Promise<Channel | undefined> {
 const live = and(eq(items.archived, false));
 
 export async function getItem(id: string): Promise<Item | undefined> {
+  await ready();
   const [row] = await db.select().from(items).where(eq(items.id, id));
   return row;
 }
 
 /** Everything happening on one date — filming and posting are different jobs. */
 export async function getDay(date: ISODate) {
+  await ready();
   const rows = await db
     .select()
     .from(items)
@@ -37,6 +42,7 @@ export async function getDay(date: ISODate) {
 }
 
 export async function getItemsInRange(start: ISODate, end: ISODate): Promise<Item[]> {
+  await ready();
   return db
     .select()
     .from(items)
@@ -57,6 +63,7 @@ export async function getItemsInRange(start: ISODate, end: ISODate): Promise<Ite
  * record session — the single number that keeps a multi-channel operation alive.
  */
 export async function getDepths(): Promise<Record<string, number>> {
+  await ready();
   const rows = await db
     .select({ channelId: items.channelId, n: sql<number>`count(*)` })
     .from(items)
@@ -66,6 +73,7 @@ export async function getDepths(): Promise<Record<string, number>> {
 }
 
 export async function getBoard(): Promise<Item[]> {
+  await ready();
   return db
     .select()
     .from(items)
@@ -74,6 +82,7 @@ export async function getBoard(): Promise<Item[]> {
 }
 
 export async function getItemsByChannel(channelId: string, limit = 200): Promise<Item[]> {
+  await ready();
   return db
     .select()
     .from(items)
@@ -83,6 +92,7 @@ export async function getItemsByChannel(channelId: string, limit = 200): Promise
 }
 
 export async function getIdeas(channelId: string): Promise<Item[]> {
+  await ready();
   return db
     .select()
     .from(items)
@@ -91,16 +101,19 @@ export async function getIdeas(channelId: string): Promise<Item[]> {
 }
 
 export async function getClips(channelId?: string) {
+  await ready();
   const where = channelId ? eq(clips.channelId, channelId) : undefined;
   return db.select().from(clips).where(where).orderBy(desc(clips.addedAt));
 }
 
 export async function getClip(id: string) {
+  await ready();
   const [row] = await db.select().from(clips).where(eq(clips.id, id));
   return row;
 }
 
 export async function getPerformance(itemId: string) {
+  await ready();
   return db
     .select()
     .from(performance)
@@ -110,6 +123,7 @@ export async function getPerformance(itemId: string) {
 
 /** Titles that actually landed — fed back into idea generation. */
 export async function getTopPerformers(channelId: string, limit = 5): Promise<string[]> {
+  await ready();
   const rows = await db
     .select({ title: items.title, views: performance.views })
     .from(performance)
@@ -121,6 +135,7 @@ export async function getTopPerformers(channelId: string, limit = 5): Promise<st
 }
 
 export async function getRecentTitles(channelId: string, limit = 40): Promise<string[]> {
+  await ready();
   const rows = await db
     .select({ title: items.title })
     .from(items)

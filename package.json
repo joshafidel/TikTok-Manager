@@ -8,10 +8,11 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "db:generate": "drizzle-kit generate",
+    "db:generate": "drizzle-kit generate && tsx scripts/gen-bootstrap.ts",
     "db:migrate": "tsx db/migrate.ts",
     "db:seed": "tsx db/seed.ts",
-    "db:reset": "rm -f data/app.db && npm run db:migrate && npm run db:seed"
+    "db:reset": "rm -f data/app.db && npm run db:migrate && npm run db:seed",
+    "db:bootstrap": "tsx scripts/gen-bootstrap.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.121.0",

@@ -13,10 +13,12 @@ publishing](#why-theres-no-publishing).
 ```bash
 npm install
 cp .env.example .env.local     # add your ANTHROPIC_API_KEY
-npm run db:migrate             # creates data/app.db
-npm run db:seed                # loads the three channel profiles
 npm run dev
 ```
+
+The app creates its own tables and loads the three channel profiles the first
+time it touches the database, so there is no migration step — locally or on a
+fresh deployment.
 
 Open <http://localhost:3000>.
 
