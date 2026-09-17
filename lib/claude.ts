@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import * as z from "zod/v4";
 import type { Channel, Item } from "@/db/schema";
+import { CRAFT_PLAYBOOK } from "./playbook";
 
 const MODEL = "claude-opus-5";
 
@@ -66,6 +67,8 @@ function channelSystem(channel: Channel): string {
     `NEVER DO`,
     never,
     channel.cta ? `\nSTANDING CALL TO ACTION\n${channel.cta}` : ``,
+    ``,
+    CRAFT_PLAYBOOK,
     ``,
     `HOW GOOD WORK IS JUDGED HERE`,
     `- The first line is the whole video. If someone scrolling past would not stop, the idea has failed regardless of how good the rest is.`,
@@ -144,8 +147,18 @@ export async function generateIdeas(opts: {
 /* -------------------------------------------------------------------------- */
 
 const ScriptSchema = z.object({
-  hook: z.string().describe("The literal first line, word for word"),
-  script: z.string().describe("The script or beat sheet, as markdown"),
+  hook: z.string().describe("The literal first line, word for word. A pattern interrupt."),
+  script: z
+    .string()
+    .describe(
+      "The script or beat sheet as markdown, with pattern interrupts marked inline as [INTERRUPT: what changes]",
+    ),
+  estimatedSeconds: z
+    .number()
+    .describe("Honest runtime at a natural speaking pace. Shorter is better than padded."),
+  loopLine: z
+    .string()
+    .describe("The closing line, written to send the viewer back to the opening frame"),
   shotNotes: z.string().describe("What to film or capture on screen, as markdown bullets"),
   caption: z.string().describe("The TikTok caption"),
   hashtags: z.array(z.string()).describe("Hashtags without the # prefix"),
@@ -191,6 +204,8 @@ export async function generateScript(opts: {
     styleBrief,
     ``,
     `Also write the caption and hashtags. The caption adds something the video does not say out loud — it does not summarise the video.`,
+    ``,
+    `Hold yourself to the playbook: the hook is a pattern interrupt, the middle carries 3-5 marked interrupts, and the close earns a rewatch. Cut the video where the idea ends rather than padding to a round number.`,
   ]
     .filter(Boolean)
     .join("\n");

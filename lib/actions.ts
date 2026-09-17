@@ -193,6 +193,8 @@ export async function runScriptGeneration(fd: FormData) {
       .set({
         hook: result.hook,
         script: result.script,
+        loopLine: result.loopLine,
+        estimatedSeconds: Math.round(result.estimatedSeconds),
         shotNotes: result.shotNotes,
         caption: result.caption,
         hashtags: result.hashtags.join(" "),
@@ -366,4 +368,64 @@ export async function signOut() {
   const { SESSION_COOKIE } = await import("./auth");
   (await cookies()).delete(SESSION_COOKIE);
   redirect("/login");
+}
+
+/* -------------------------------------------------------------------------- */
+/* Idea pool                                                                  */
+/* -------------------------------------------------------------------------- */
+
+export type PoolResult = { added?: number; error?: string };
+
+/** Tops the account back up to ten ideas. Scripts follow via writeScriptsAction. */
+export async function ensurePoolAction(channelId: string): Promise<PoolResult> {
+  try {
+    const { ensurePool } = await import("./pool");
+    const r = await ensurePool(channelId);
+    refreshAll();
+    return r;
+  } catch (err) {
+    return { error: errorMessage(err) };
+  }
+}
+
+export type ScriptBatchResult = { written: number; remaining: number; error?: string };
+
+/** Writes the next few scripts. The client repeats until nothing remains. */
+export async function writeScriptsAction(channelId: string): Promise<ScriptBatchResult> {
+  try {
+    const { writeNextScripts } = await import("./pool");
+    const r = await writeNextScripts(channelId);
+    refreshAll();
+    return r;
+  } catch (err) {
+    return { written: 0, remaining: 0, error: errorMessage(err) };
+  }
+}
+
+/**
+ * Crosses an idea off. Rejected ideas are archived; recorded ones move into the
+ * pipeline so they keep their script. Either way a replacement idea is drawn so
+ * the account always shows ten.
+ */
+export async function crossOffIdea(fd: FormData): Promise<void> {
+  const id = str(fd, "id");
+  const reason = str(fd, "reason");
+  if (!id) return;
+
+  const item = await getItem(id);
+  if (!item) return;
+
+  if (reason === "recorded") {
+    await db
+      .update(items)
+      .set({ status: "recorded", recordOn: todayISO(), updatedAt: now() })
+      .where(eq(items.id, id));
+  } else {
+    await db.update(items).set({ archived: true, updatedAt: now() }).where(eq(items.id, id));
+  }
+
+  // Draw the replacement idea now; its script is written by the pool filler on
+  // the next render, which keeps this click from waiting on two model calls.
+  await ensurePoolAction(item.channelId);
+  refreshAll();
 }

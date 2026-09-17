@@ -22,7 +22,8 @@ export const viewport: Viewport = {
 };
 
 const NAV = [
-  { href: "/", label: "Today" },
+  { href: "/", label: "Accounts" },
+  { href: "/today", label: "Today" },
   { href: "/calendar", label: "Calendar" },
   { href: "/pipeline", label: "Pipeline" },
   { href: "/clips", label: "Clips" },

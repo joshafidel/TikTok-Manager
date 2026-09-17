@@ -40,6 +40,8 @@ export const channels = sqliteTable("channels", {
   /** Days of the week reserved for filming. 0 = Sunday. */
   recordDays: text("record_days", { mode: "json" }).$type<number[]>().notNull(),
   sortOrder: integer("sort_order").notNull().default(0),
+  /** Path under /public — the account icon shown on the picker screen. */
+  logo: text("logo"),
 });
 
 export const items = sqliteTable("items", {
@@ -54,6 +56,8 @@ export const items = sqliteTable("items", {
   hook: text("hook"),
   script: text("script"),
   shotNotes: text("shot_notes"),
+  loopLine: text("loop_line"),
+  estimatedSeconds: integer("estimated_seconds"),
   caption: text("caption"),
   hashtags: text("hashtags"),
   /** The two dates that make the calendar work: film day and post day. */
@@ -97,7 +101,52 @@ export const performance = sqliteTable("performance", {
   recordedAt: text("recorded_at").notNull(),
 });
 
+/** Where an uploaded recording is in the auto-edit pipeline. */
+export const VIDEO_STATUSES = [
+  "uploaded",
+  "transcribing",
+  "planning",
+  "rendering",
+  "ready",
+  "failed",
+] as const;
+export type VideoStatus = (typeof VIDEO_STATUSES)[number];
+
+export type Word = { text: string; start: number; end: number; filler?: boolean };
+export type Cut = { start: number; end: number; reason: "filler" | "silence" };
+export type Caption = { text: string; start: number; end: number };
+
+/** The plan the editor derived from the transcript, before rendering. */
+export type EditPlan = {
+  sourceDuration: number;
+  keptDuration: number;
+  cuts: Cut[];
+  captions: Caption[];
+};
+
+export const videos = sqliteTable("videos", {
+  id: text("id").primaryKey(),
+  channelId: text("channel_id")
+    .notNull()
+    .references(() => channels.id),
+  itemId: text("item_id"),
+  filename: text("filename").notNull(),
+  sourceUrl: text("source_url").notNull(),
+  sizeBytes: integer("size_bytes"),
+  status: text("status").$type<VideoStatus>().notNull().default("uploaded"),
+  transcriptId: text("transcript_id"),
+  transcriptText: text("transcript_text"),
+  words: text("words", { mode: "json" }).$type<Word[]>(),
+  plan: text("plan", { mode: "json" }).$type<EditPlan>(),
+  renderId: text("render_id"),
+  renderUrl: text("render_url"),
+  error: text("error"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
 export type Channel = typeof channels.$inferSelect;
 export type Item = typeof items.$inferSelect;
 export type Clip = typeof clips.$inferSelect;
 export type Performance = typeof performance.$inferSelect;
+export type Video = typeof videos.$inferSelect;

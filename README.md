@@ -22,6 +22,45 @@ fresh deployment.
 
 Open <http://localhost:3000>.
 
+## How you actually use it
+
+Open the app and you get three account icons. Tap one, and every account works
+identically:
+
+1. **Ten ideas, each with a full script.** They generate on first open and stay
+   topped up. Each carries a word-for-word hook, the script with pattern
+   interrupts marked inline, an honest runtime, a closing line written to earn a
+   rewatch, shot notes, a caption and hashtags.
+2. **Cross one off** — "Not for me" or "Recorded it" — and a replacement is
+   drawn immediately, so the list is always ten.
+3. **Upload the recording** and it comes back edited: filler words and dead air
+   cut, captions burned in, vertical MP4.
+4. **Recording guidance** sits on the same screen, so it is where the work is.
+
+The scripts are written against researched 2026 retention mechanics rather than
+generic advice — see [docs/research.md](docs/research.md) for what and why.
+
+## The auto-editor
+
+Upload goes straight from your browser to blob storage, because a video is far
+past what a serverless request body allows. Then:
+
+```
+transcribe (word-level timings)  →  plan the cuts  →  render
+```
+
+The planner removes filler words and any pause over about half a second, merges
+overlapping cuts, and rebuilds the caption timings against the *shortened*
+timeline — that last part is where this kind of code usually goes quietly wrong,
+so it has unit tests (`npm test`).
+
+Each stage advances in its own short request rather than one long one, since
+transcription and rendering both take longer than a serverless function may run.
+
+Rendering defaults to Shotstack's free sandbox, which watermarks output. Set
+`SHOTSTACK_ENV=production` once you are happy with the results. Costs roughly
+$0.10-0.40 per video.
+
 ## The model
 
 A video is not a calendar event, it's a pipeline with a state:

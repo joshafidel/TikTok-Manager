@@ -16,9 +16,27 @@ import { CHANNEL_SEED } from "./channels";
  */
 let started: Promise<void> | null = null;
 
+/**
+ * `CREATE TABLE IF NOT EXISTS` is re-runnable, but `ALTER TABLE ... ADD COLUMN`
+ * is not — SQLite has no IF NOT EXISTS for it. Since this runs on every cold
+ * start, swallow exactly the "already applied" errors and let anything else
+ * surface.
+ */
+const ALREADY_APPLIED = /duplicate column name|already exists/i;
+
+/** The driver reports the real SQLite message on `cause`, not on the error itself. */
+function isAlreadyApplied(err: unknown): boolean {
+  const e = err as { message?: string; cause?: { message?: string } } | null;
+  return ALREADY_APPLIED.test(`${e?.message ?? ""} ${e?.cause?.message ?? ""}`);
+}
+
 async function bootstrap(): Promise<void> {
   for (const statement of BOOTSTRAP_DDL) {
-    await db.run(sql.raw(statement));
+    try {
+      await db.run(sql.raw(statement));
+    } catch (err) {
+      if (!isAlreadyApplied(err)) throw err;
+    }
   }
 
   const [{ n }] = await db

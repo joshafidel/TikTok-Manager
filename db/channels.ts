@@ -125,6 +125,7 @@ const tallyFormats: Format[] = [
 export const CHANNEL_SEED = [
   {
     id: "ai",
+    logo: "/logos/ai-with-receipts.png",
     name: "AI, with receipts",
     handle: null,
     accent: "#2A62A8",
@@ -151,6 +152,7 @@ export const CHANNEL_SEED = [
   },
   {
     id: "reactions",
+    logo: "/logos/reactions.png",
     name: "Reactions",
     handle: null,
     accent: "#71469E",
@@ -177,6 +179,7 @@ export const CHANNEL_SEED = [
   },
   {
     id: "tally",
+    logo: "/logos/tally.png",
     name: "Tally",
     handle: null,
     accent: "#1F7A5C",

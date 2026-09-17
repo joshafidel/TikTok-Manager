@@ -1,0 +1,1 @@
+ALTER TABLE `videos` ADD `transcript_id` text;
