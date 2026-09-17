@@ -171,6 +171,29 @@ libsql/SQLite, Tailwind v4, `@anthropic-ai/sdk`.
 
 Single user by design — one password, one operator. Don't make it multi-tenant.
 
+## Editor tooling (MCP)
+
+`.mcp.json` declares the MCP servers this project uses when working on it in
+Claude Code, copied from the nyfoodies repo:
+
+| Server | What it's for |
+|---|---|
+| `firecrawl` | Scraping and crawling pages — useful for sourcing clips and trend research |
+| `perplexity` | Research lookups |
+| `playwright` | Driving a browser |
+| `chrome-devtools` | Inspecting the running app |
+
+Two of them read API keys from your shell environment, not from `.env.local`:
+
+```bash
+export FIRECRAWL_API_KEY=fc-...
+export PERPLEXITY_API_KEY=pplx-...
+```
+
+Put those in your shell profile. They are only for local development — the
+deployed app does not use them, so do not add them in Vercel. The other two
+servers need no key.
+
 ## Scripts
 
 ```bash
