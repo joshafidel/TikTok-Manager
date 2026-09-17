@@ -1,0 +1,1 @@
+ALTER TABLE `items` ADD `from_user` integer DEFAULT false NOT NULL;

@@ -1,7 +1,7 @@
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db, channels } from "./index";
 import { BOOTSTRAP_DDL } from "./bootstrap";
-import { CHANNEL_SEED } from "./channels";
+import { CHANNEL_SEED, SUPERSEDED_MISSIONS } from "./channels";
 
 /**
  * First-run setup, done by the app itself.
@@ -48,6 +48,36 @@ async function bootstrap(): Promise<void> {
     for (const row of CHANNEL_SEED) {
       await db.insert(channels).values(row).onConflictDoNothing();
     }
+    return;
+  }
+
+  await refreshUntouchedProfiles();
+}
+
+/**
+ * Replaces profiles that still carry a superseded default. Seeding alone only
+ * ever runs against an empty table, so without this a corrected profile would
+ * never reach a database that already exists. Anything the user has edited is
+ * left exactly as they wrote it.
+ */
+async function refreshUntouchedProfiles(): Promise<void> {
+  const existing = await db.select().from(channels);
+
+  for (const row of CHANNEL_SEED) {
+    const current = existing.find((c) => c.id === row.id);
+    if (!current || !SUPERSEDED_MISSIONS.has(current.mission)) continue;
+
+    await db
+      .update(channels)
+      .set({
+        mission: row.mission,
+        audience: row.audience,
+        voice: row.voice,
+        formats: row.formats,
+        neverDo: row.neverDo,
+        newsDriven: row.newsDriven ?? false,
+      })
+      .where(eq(channels.id, row.id));
   }
 }
 

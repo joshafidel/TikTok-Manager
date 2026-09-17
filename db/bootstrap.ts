@@ -14,5 +14,7 @@ export const BOOTSTRAP_DDL: string[] = [
   "ALTER TABLE `videos` ADD `caption` text;",
   "ALTER TABLE `videos` ADD `caption_alt` text;",
   "ALTER TABLE `videos` ADD `hashtags` text;",
-  "ALTER TABLE `videos` ADD `hashtag_note` text;"
+  "ALTER TABLE `videos` ADD `hashtag_note` text;",
+  "ALTER TABLE `items` ADD `from_user` integer DEFAULT false NOT NULL;",
+  "ALTER TABLE `channels` ADD `news_driven` integer DEFAULT false NOT NULL;"
 ];

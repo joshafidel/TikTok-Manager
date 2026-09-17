@@ -3,10 +3,6 @@ export const dynamic = "force-dynamic";
 export default function LockedPage() {
   const dbUrl = process.env.DATABASE_URL;
   const missing = [
-    !process.env.APP_PASSWORD && {
-      name: "APP_PASSWORD",
-      why: "Any long random string you invent. It becomes your login. Without it, anyone who finds this URL could read your scripts and spend your Anthropic credit.",
-    },
     (!dbUrl || dbUrl.startsWith("file:")) && {
       name: "DATABASE_URL",
       why: "The libsql:// address of your Turso database. A hosted app can't use a local file, because the filesystem is wiped on every deploy.",

@@ -1,6 +1,6 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
-import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, or } from "drizzle-orm";
 import { db, items } from "@/db";
 import type { Item } from "@/db/schema";
 import { generateIdeas, generateScript } from "./claude";
@@ -28,7 +28,8 @@ export async function getPool(channelId: string): Promise<Item[]> {
         inArray(items.status, ["idea", "scripted"]),
       ),
     )
-    .orderBy(asc(items.createdAt))
+    // Your own ideas first — you asked for those, the rest are suggestions.
+    .orderBy(desc(items.fromUser), asc(items.createdAt))
     .limit(POOL_SIZE * 2);
 }
 
@@ -46,7 +47,25 @@ export async function ensurePool(channelId: string, target = POOL_SIZE) {
     getTopPerformers(channelId),
   ]);
 
-  const ideas = await generateIdeas({ channel, count: missing, recentTitles, topPerformers });
+  // A news channel needs real material in front of it, or it invents plausible
+  // fiction — which is exactly what makes it read as fake.
+  let newsDigest: string | undefined;
+  if (channel.newsDriven) {
+    const { getNewsDigest } = await import("./news");
+    try {
+      newsDigest = await getNewsDigest(channel);
+    } catch {
+      // Fall through without it rather than blocking the batch entirely.
+    }
+  }
+
+  const ideas = await generateIdeas({
+    channel,
+    count: missing,
+    recentTitles,
+    topPerformers,
+    newsDigest,
+  });
   if (!ideas.length) return { added: 0 };
 
   await db.insert(items).values(

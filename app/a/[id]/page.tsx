@@ -7,7 +7,7 @@ import { getChannel } from "@/lib/queries";
 import { getPool, POOL_SIZE } from "@/lib/pool";
 import { crossOffIdea } from "@/lib/actions";
 import { RECORDING_TIPS } from "@/lib/playbook";
-import { CrossOffButton, PoolFiller } from "@/components/pool-client";
+import { CrossOffButton, MyIdeaBox, PoolFiller } from "@/components/pool-client";
 import { VideoUploader } from "@/components/video-client";
 import { SectionHead } from "@/components/ui";
 
@@ -57,6 +57,7 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
 
       <section>
         <SectionHead num="01" title="Your ten ideas" />
+        <MyIdeaBox channelId={channel.id} />
         <PoolFiller
           channelId={channel.id}
           missingIdeas={Math.max(0, POOL_SIZE - pool.length)}
@@ -72,6 +73,7 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
                 </span>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-base font-semibold leading-snug">{item.title}</h3>
+                  {item.fromUser && <span className="label mt-1 block">Your idea</span>}
 
                   {item.hook && (
                     <p className="mt-2 border-l-2 border-[var(--tally)] pl-3 text-[0.95rem] font-medium italic leading-snug">

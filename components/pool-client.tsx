@@ -110,3 +110,72 @@ export function CrossOffButton({
     </>
   );
 }
+
+/** Type your own idea and get a script for it. Sits above the suggestions. */
+export function MyIdeaBox({ channelId }: { channelId: string }) {
+  const router = useRouter();
+  const [idea, setIdea] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [done, setDone] = useState(false);
+
+  async function submit() {
+    if (!idea.trim() || busy) return;
+    setBusy(true);
+    setError(null);
+    setDone(false);
+
+    const { scriptMyIdea } = await import("@/lib/actions");
+    const r = await scriptMyIdea({ channelId, idea });
+
+    if (r.error) setError(r.error);
+    else {
+      setIdea("");
+      setDone(true);
+      router.refresh();
+    }
+    setBusy(false);
+  }
+
+  return (
+    <div className="card mb-5 p-4">
+      <label className="label" htmlFor="my-idea">
+        Got your own idea? Describe it and I&apos;ll write the script
+      </label>
+      <textarea
+        id="my-idea"
+        value={idea}
+        onChange={(e) => setIdea(e.target.value)}
+        rows={3}
+        placeholder="e.g. react to that video of the guy microwaving a whole rotisserie chicken"
+        className="input mt-1.5"
+        disabled={busy}
+      />
+      <div className="mt-2 flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => void submit()}
+          disabled={busy || !idea.trim()}
+        >
+          {busy ? "Writing it…" : "Write the script"}
+        </button>
+        {busy && (
+          <span className="font-mono text-[0.62rem] text-ink3">
+            Takes up to a minute — it&apos;s writing a full script.
+          </span>
+        )}
+        {done && !busy && (
+          <span className="font-mono text-[0.62rem] text-[var(--good)]">
+            Done — it&apos;s at the top of the list.
+          </span>
+        )}
+        {error && (
+          <span className="font-mono text-[0.62rem] leading-relaxed text-[var(--tally)]">
+            {error}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}

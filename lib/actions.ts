@@ -429,3 +429,60 @@ export async function crossOffIdea(fd: FormData): Promise<void> {
   await ensurePoolAction(item.channelId);
   refreshAll();
 }
+
+/**
+ * Takes an idea you typed and writes the script for it. Yours go to the top of
+ * the list, above the generated suggestions.
+ */
+export async function scriptMyIdea(input: {
+  channelId: string;
+  idea: string;
+}): Promise<{ id?: string; error?: string }> {
+  const idea = input.idea.trim();
+  if (!idea) return { error: "Type an idea first." };
+
+  const channel = await getChannel(input.channelId);
+  if (!channel) return { error: "Channel not found." };
+
+  const id = randomUUID();
+  try {
+    await db.insert(items).values({
+      id,
+      channelId: input.channelId,
+      // A one-line idea doubles as its working title until the script names it.
+      title: idea.length > 70 ? `${idea.slice(0, 67)}…` : idea,
+      premise: idea,
+      status: "idea",
+      fromUser: true,
+      createdAt: now(),
+      updatedAt: now(),
+    });
+
+    const { generateScript } = await import("./claude");
+    const item = await getItem(id);
+    if (!item) return { error: "Could not save the idea." };
+
+    const script = await generateScript({ channel, item });
+    await db
+      .update(items)
+      .set({
+        hook: script.hook,
+        script: script.script,
+        loopLine: script.loopLine,
+        estimatedSeconds: Math.round(script.estimatedSeconds),
+        shotNotes: script.shotNotes,
+        caption: script.caption,
+        hashtags: script.hashtags.join(" "),
+        status: "scripted",
+        updatedAt: now(),
+      })
+      .where(eq(items.id, id));
+
+    refreshAll();
+    return { id };
+  } catch (err) {
+    // Keep the idea even if the script failed — the pool filler retries it.
+    refreshAll();
+    return { error: errorMessage(err) };
+  }
+}

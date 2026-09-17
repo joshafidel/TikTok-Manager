@@ -1,0 +1,1 @@
+ALTER TABLE `channels` ADD `news_driven` integer DEFAULT false NOT NULL;

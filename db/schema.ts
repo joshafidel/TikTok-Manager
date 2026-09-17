@@ -42,6 +42,8 @@ export const channels = sqliteTable("channels", {
   sortOrder: integer("sort_order").notNull().default(0),
   /** Path under /public — the account icon shown on the picker screen. */
   logo: text("logo"),
+  /** Search the web for real, current material before writing ideas. */
+  newsDriven: integer("news_driven", { mode: "boolean" }).notNull().default(false),
 });
 
 export const items = sqliteTable("items", {
@@ -68,6 +70,8 @@ export const items = sqliteTable("items", {
   postUrl: text("post_url"),
   clipId: text("clip_id"),
   notes: text("notes"),
+  /** Ideas you typed in yourself, which sort above the generated ones. */
+  fromUser: integer("from_user", { mode: "boolean" }).notNull().default(false),
   archived: integer("archived", { mode: "boolean" }).notNull().default(false),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),

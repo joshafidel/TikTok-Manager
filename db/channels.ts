@@ -7,44 +7,44 @@ import type { Format } from "./schema";
  */
 const aiFormats: Format[] = [
   {
+    key: "what-happened",
+    name: "What just happened",
+    description:
+      "One specific, named thing that actually happened in AI in the last week or two.",
+    structure:
+      "Name it in the first line — the model, company or feature, exactly → what actually changed → the detail the coverage skipped → what it means for the viewer specifically → the sentence they can repeat to someone at work.",
+  },
+  {
+    key: "open-this",
+    name: "Open this today",
+    description:
+      "A real site or app the viewer can use in the next five minutes. Screen recording, not description.",
+    structure:
+      "Say the name and what it does in one line → show it working on screen → the one thing it does better than the obvious alternative → what it costs → who should not bother.",
+  },
+  {
     key: "headline-decode",
     name: "What that headline actually means",
     description:
-      "Take an AI story people are misreading this week and give the real version.",
+      "A real story people are misreading this week, given the accurate version.",
     structure:
-      "Name the headline everyone saw → say plainly what it actually claims → the one detail the coverage dropped → what it means for the viewer → the sentence they can repeat to someone else.",
+      "Quote the headline everyone saw → what the source actually says → the number or caveat that got dropped → whether it changes anything → the corrected one-liner.",
   },
   {
-    key: "i-ran-it",
-    name: "I ran it myself",
+    key: "use-it-for",
+    name: "Use it for this",
     description:
-      "Hands-on test of a tool, model, or claim, with the screen recording as proof.",
+      "A practical job done with a named tool, start to finish, on screen.",
     structure:
-      "State the claim → show the setup in one shot → show the result unedited → where it broke → the honest verdict in one line.",
+      "The job, stated plainly → the tool being used → the actual steps on screen → the result, unedited → where it falls down.",
   },
   {
-    key: "paper-nobody-read",
-    name: "The paper nobody read",
+    key: "before-monday",
+    name: "What you need to know",
     description:
-      "One real finding from a paper, explained without jargon, with a diagram.",
+      "A tight roundup of the three things that actually mattered this week.",
     structure:
-      "The surprising finding first → why the obvious intuition is wrong → the mechanism in one diagram → the caveat → why it changes what you'd do.",
-  },
-  {
-    key: "quiet-failure",
-    name: "What your AI tool is quietly doing wrong",
-    description:
-      "A specific, demonstrable failure mode in a tool the audience already uses.",
-    structure:
-      "Show the failure happening on screen → explain why it happens → show the fix → the general rule behind it.",
-  },
-  {
-    key: "term-in-60",
-    name: "The term, properly",
-    description:
-      "A term people use wrong (RAG, agent, fine-tune, reasoning) defined precisely.",
-    structure:
-      "The wrong definition people repeat → the actual definition → a concrete example → the test for telling them apart.",
+      "Three, counted out → each one named, with what changed → which of the three actually affects the viewer → close on the one to watch next week.",
   },
 ];
 
@@ -122,6 +122,16 @@ const tallyFormats: Format[] = [
   },
 ];
 
+/**
+ * Missions shipped in earlier versions. A channel still carrying one of these
+ * has never been edited, so it is safe to replace with the current default —
+ * that is how a profile correction reaches a database that was seeded before
+ * the fix. A channel the user has edited keeps their wording.
+ */
+export const SUPERSEDED_MISSIONS = new Set<string>([
+  "Establish real credibility on AI by being consistently more precise than everyone else in the feed. This channel is the top of the funnel for Tally — a viewer who trusts the explanations is a viewer who will try the app.",
+]);
+
 export const CHANNEL_SEED = [
   {
     id: "ai",
@@ -130,18 +140,20 @@ export const CHANNEL_SEED = [
     handle: null,
     accent: "#2A62A8",
     mission:
-      "Establish real credibility on AI by being consistently more precise than everyone else in the feed. This channel is the top of the funnel for Tally — a viewer who trusts the explanations is a viewer who will try the app.",
+      "Keep people current on AI. Real news, real tools, real applications — what actually happened, what it means, and what is worth opening today. Credibility comes from being accurate and specific about things that genuinely exist, faster than the people around them. This is the channel brands in the AI space pay to be next to, and the top of the funnel for Tally.",
     audience:
-      "Curious non-experts and early-career technical people who follow AI news, feel behind, and are tired of both hype and doom. They can tell when someone actually understands the material.",
+      "Curious non-experts and early-career technical people who want to stay current without reading twenty newsletters. They feel behind, they are tired of hype and doom, and they can tell immediately when someone is describing something they have not actually used.",
     voice:
       "Precise, calm, a little dry. Explains rather than performs. Confident enough to say 'this part is genuinely unsettled'. Never breathless, never a doomer, never a booster.",
     formats: aiFormats,
     neverDo: [
+      "Inventing anything. No made-up tools, companies, studies, numbers, benchmarks or events. If there is no real, current, named thing to point at, there is no video.",
+      "Hypothetical framing of any kind — 'imagine if', 'let's say a company', 'picture this', 'suppose you had'. This channel covers what happened, not what could.",
+      "Talking about a tool in the abstract instead of showing it on screen. If you cannot demo it, you have not used it enough to cover it.",
       "Mentioning the master's degree — it is in the bio, and saying it out loud reads as insecurity. Demonstrate instead.",
       "Hype framing: 'this changes everything', 'nobody is talking about this', 'AI just did something insane'.",
       "Predicting AGI timelines or job apocalypses.",
-      "Explaining a paper you have not read past the abstract.",
-      "Vague claims with no example, number, or screen recording behind them.",
+      "Covering a paper you have not read past the abstract, or a story you have only seen summarised.",
     ],
     cta: null,
     scriptStyle: "full" as const,
@@ -149,6 +161,7 @@ export const CHANNEL_SEED = [
     targetDepth: 6,
     recordDays: [0, 3],
     sortOrder: 1,
+    newsDriven: true,
   },
   {
     id: "reactions",

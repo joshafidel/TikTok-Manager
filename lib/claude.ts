@@ -106,8 +106,10 @@ export async function generateIdeas(opts: {
   topPerformers?: string[];
   /** Free-text steer from the user: a theme, a news peg, a clip to build on. */
   steer?: string;
+  /** Real, current material to build on. Without it the model invents plausible fiction. */
+  newsDigest?: string;
 }): Promise<GeneratedIdea[]> {
-  const { channel, count, recentTitles, topPerformers = [], steer } = opts;
+  const { channel, count, recentTitles, topPerformers = [], steer, newsDigest } = opts;
 
   const context = [
     `Generate ${count} video ideas for this channel.`,
@@ -121,6 +123,17 @@ export async function generateIdeas(opts: {
       ? `\nTHESE PERFORMED WELL — the batch should lean toward what made them work:\n${topPerformers.map((t) => `- ${t}`).join("\n")}`
       : ``,
     steer ? `\nSTEER FOR THIS BATCH\n${steer}` : ``,
+    newsDigest
+      ? [
+          ``,
+          `WHAT IS ACTUALLY HAPPENING RIGHT NOW`,
+          `These were pulled from the web just now. Build the batch on these real items.`,
+          ``,
+          newsDigest,
+          ``,
+          `Every idea must point at something on this list, named exactly. Do not invent a study, a tool, a company, a number or an event. Do not write a hypothetical scenario — "imagine if", "let's say a company", "picture this" are all failures here. If an item on the list is too thin to carry a video, skip it rather than embellishing it.`,
+        ].join("\n")
+      : ``,
   ].join("\n");
 
   const response = await getClient().beta.messages.parse({
