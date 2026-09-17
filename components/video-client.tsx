@@ -121,6 +121,37 @@ export function VideoUploader({ channelId }: { channelId: string }) {
               Open your edited video
             </a>
           )}
+
+          {state.caption && (
+            <div className="mt-4 border-t border-rulesoft pt-3">
+              <p className="label">Caption — written from what you actually said</p>
+              <Copyable text={state.caption} />
+              {state.captionAlt && (
+                <>
+                  <p className="label mt-3">Second option</p>
+                  <Copyable text={state.captionAlt} />
+                </>
+              )}
+              {state.hashtags && (
+                <>
+                  <p className="label mt-3">Hashtags</p>
+                  <Copyable
+                    text={state.hashtags
+                      .split(/\s+/)
+                      .filter(Boolean)
+                      .map((h) => (h.startsWith("#") ? h : `#${h}`))
+                      .join(" ")}
+                    mono
+                  />
+                  {state.hashtagNote && (
+                    <p className="mt-1.5 font-mono text-[0.62rem] leading-relaxed text-ink3">
+                      {state.hashtagNote}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -128,6 +159,33 @@ export function VideoUploader({ channelId }: { channelId: string }) {
         <p className="mt-2 font-mono text-[0.68rem] leading-relaxed text-[var(--tally)]">{error}</p>
       )}
     </div>
+  );
+}
+
+/** Tap-to-copy — on a phone this is the whole point. */
+function Copyable({ text, mono }: { text: string; mono?: boolean }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      className={`mt-1 w-full rounded-sm border border-rulesoft bg-surface2 p-2.5 text-left text-sm leading-relaxed transition-colors hover:border-rule ${
+        mono ? "font-mono text-[0.72rem] text-ink3" : "text-ink2"
+      }`}
+      onClick={() => {
+        navigator.clipboard.writeText(text).then(
+          () => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1400);
+          },
+          () => setCopied(false),
+        );
+      }}
+    >
+      {text}
+      <span className="label mt-1.5 block !text-[var(--tally)]">
+        {copied ? "Copied" : "Tap to copy"}
+      </span>
+    </button>
   );
 }
 

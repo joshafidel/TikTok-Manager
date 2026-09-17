@@ -9,6 +9,8 @@ import { ready } from "@/db/ready";
 import { fetchTranscription, startTranscription } from "./video/transcribe";
 import { planEdit } from "./video/plan";
 import { checkRender, submitRender } from "./video/render";
+import { captionForVideo } from "./claude";
+import { getChannel } from "./queries";
 
 const now = () => new Date().toISOString();
 
@@ -18,6 +20,10 @@ export type VideoState = {
   label: string;
   url?: string | null;
   error?: string | null;
+  caption?: string | null;
+  captionAlt?: string | null;
+  hashtags?: string | null;
+  hashtagNote?: string | null;
   /** True while the client should keep calling advanceVideo. */
   working: boolean;
   summary?: string;
@@ -77,6 +83,10 @@ function state(v: Video): VideoState {
     label: LABEL[v.status],
     url: v.renderUrl,
     error: v.error,
+    caption: v.caption,
+    captionAlt: v.captionAlt,
+    hashtags: v.hashtags,
+    hashtagNote: v.hashtagNote,
     working: v.status !== "ready" && v.status !== "failed",
     summary: v.plan
       ? `Cut ${v.plan.cuts.length} dead spots — ${v.plan.sourceDuration.toFixed(1)}s down to ${v.plan.keptDuration.toFixed(1)}s`
@@ -117,6 +127,23 @@ export async function advanceVideo(id: string): Promise<VideoState | null> {
           plan,
           status: "planning",
         });
+
+        // Write the caption from what was actually said on camera. A failure
+        // here must not sink the edit — the video is the deliverable.
+        try {
+          const channel = await getChannel(video.channelId);
+          if (channel && result.text.trim()) {
+            const c = await captionForVideo({ channel, transcript: result.text });
+            await patch(id, {
+              caption: c.caption,
+              captionAlt: c.captionAlt,
+              hashtags: c.hashtags.join(" "),
+              hashtagNote: c.hashtagNote,
+            });
+          }
+        } catch {
+          // Leave the caption fields empty; the edit continues regardless.
+        }
         break;
       }
 

@@ -39,6 +39,30 @@ Cold start, and the 2026 follower-first change.
 - The first cohort is small — a few hundred viewers over the first 30-90 minutes. Roughly 35% completion plus about 1.5% meaningful engagement is what graduates a video.
 - Practically: write for the people who already follow this account, not for a hypothetical mass audience.
 
+MAKING MONEY FROM THIS (2026)
+
+These accounts exist to earn, and that changes what a good video is.
+
+- Ad revenue is small. The Creator Rewards Program pays roughly $0.20-0.40 per 1,000 qualified views for most US creators — about $300-1,000 per million views. Views alone are not a business.
+- Crucially, only videos OVER ONE MINUTE earn ad revenue at all. Anything under a minute earns nothing from Rewards. Eligibility also needs 10,000 followers and 100,000 views in 30 days.
+- Brand deals are the real money at almost every follower count, and they are bought on NICHE and audience trust, not raw view count. A tightly defined audience a sponsor wants to reach is worth more than a large undifferentiated one.
+- Affiliate commission on products shown in-video is the other real lane.
+
+The tension you must resolve per video, deliberately:
+- Short and fully watched is what wins reach and followers.
+- Over a minute is what earns ad revenue.
+- These pull in opposite directions. Do not split the difference into a padded 70-second video — that loses both. Either make it tight and short to grow, or make it genuinely worth 60+ seconds of attention to earn.
+- When a script would be strong at 60-90 seconds because the subject actually carries it, say so and write it that way. When the idea is a 20-second idea, keep it 20 seconds and treat it as audience growth, not revenue.
+
+What this means for the writing:
+- Give every video a clear reason a sponsor in this niche would want to be next to it, or a clear reason it grows the audience. If it does neither, it is not worth recording.
+- Demonstrated expertise and genuine usefulness attract brand deals. Cheap engagement bait does not, and actively repels them.
+
+HASHTAGS
+- 3-5 total. More dilutes the topic signal and makes the algorithm less certain what the video is about.
+- Mix 1-2 broad or trending tags with 2-3 specific niche ones. Relevance beats popularity — the niche tags are what reach people who actually care.
+- Hashtags are a topic signal, not a lottery ticket. Tags unrelated to the content actively hurt distribution.
+
 SCRIPT SHAPE
 - Hook (0-3s): one sentence, pattern interrupt, written word for word.
 - Body: 3-4 short punchy segments, each one idea, each ending on a reason to stay.

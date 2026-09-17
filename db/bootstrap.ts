@@ -10,5 +10,9 @@ export const BOOTSTRAP_DDL: string[] = [
   "ALTER TABLE `channels` ADD `logo` text;",
   "ALTER TABLE `items` ADD `loop_line` text;",
   "ALTER TABLE `items` ADD `estimated_seconds` integer;",
-  "ALTER TABLE `videos` ADD `transcript_id` text;"
+  "ALTER TABLE `videos` ADD `transcript_id` text;",
+  "ALTER TABLE `videos` ADD `caption` text;",
+  "ALTER TABLE `videos` ADD `caption_alt` text;",
+  "ALTER TABLE `videos` ADD `hashtags` text;",
+  "ALTER TABLE `videos` ADD `hashtag_note` text;"
 ];

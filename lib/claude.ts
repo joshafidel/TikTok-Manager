@@ -236,3 +236,65 @@ function assertNotRefused(stopReason: string | null) {
     );
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/* Captions for a recorded video                                              */
+/* -------------------------------------------------------------------------- */
+
+const CaptionSchema = z.object({
+  caption: z.string().describe("The caption to post with this video"),
+  captionAlt: z.string().describe("A second, differently-angled option"),
+  hashtags: z
+    .array(z.string())
+    .describe("3-5 hashtags without the # prefix, mixing broad reach with niche relevance"),
+  hashtagNote: z
+    .string()
+    .describe("One sentence on which tags are the broad ones and which are the niche ones, and why"),
+});
+
+export type GeneratedCaption = z.infer<typeof CaptionSchema>;
+
+/**
+ * Writes the caption from what was actually said on camera, rather than from
+ * the script that was planned — takes drift, ad libs and all.
+ */
+export async function captionForVideo(opts: {
+  channel: Channel;
+  transcript: string;
+}): Promise<GeneratedCaption> {
+  const { channel, transcript } = opts;
+
+  const response = await getClient().beta.messages.parse({
+    model: MODEL,
+    max_tokens: 8000,
+    betas: [FALLBACK_BETA],
+    fallbacks: "default",
+    thinking: { type: "adaptive" },
+    output_config: { effort: "medium", format: zodOutputFormat(CaptionSchema) },
+    system: [
+      { type: "text", text: channelSystem(channel), cache_control: { type: "ephemeral" } },
+    ],
+    messages: [
+      {
+        role: "user",
+        content: [
+          `Here is the transcript of a video that was just recorded for this channel.`,
+          ``,
+          `---`,
+          transcript.slice(0, 12000),
+          `---`,
+          ``,
+          `Write the caption from what was actually said, not from what might have been planned.`,
+          `The caption should add something the video does not say out loud — a second angle, a question worth answering in the comments, or the detail that makes someone send it to a friend. It must not summarise the video.`,
+          ``,
+          `Then choose the hashtags by the playbook: 3-5 total, 1-2 broad and 2-3 genuinely niche, every one of them actually relevant to what was said. The goal is reaching the people most likely to watch this to the end and follow, not the largest possible number of impressions — irrelevant tags weaken the topic signal and cost reach.`,
+        ].join("\n"),
+      },
+    ],
+  });
+
+  assertNotRefused(response.stop_reason);
+  const parsed = response.parsed_output;
+  if (!parsed) throw new GenerationError("Claude returned no parseable caption. Try again.");
+  return parsed;
+}

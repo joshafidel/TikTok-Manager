@@ -49,3 +49,29 @@ clean audio matter more than the camera.
 - [Pattern interrupts and mid-video retention](https://edicionvideopro.com/en/editing-for-platforms-video-marketing/pattern-interrupts-tiktok-retention-guide/)
 - [Script structure and pacing](https://teleprompter.works/blog/tiktok-script-guide/)
 - [Recording setup: lighting, audio, framing](https://www.buyzivo.com/best-mobile-accessories-for-tiktok/)
+
+## Monetization (added after "the goal is to make money")
+
+**Ad revenue is small, and gated at one minute.** The Creator Rewards Program
+pays roughly $0.20-0.40 RPM for most US creators — about $300-1,000 per million
+qualified views. Only videos **over one minute** earn from it at all, and
+eligibility needs 10,000 followers plus 100,000 views in 30 days.
+
+**Brand deals are the real money**, at almost every follower count, and they are
+bought on niche and audience trust rather than raw views. Affiliate commission
+on shown products is the other genuine lane.
+
+This creates a tension the playbook now names explicitly: short-and-complete
+wins reach, over-a-minute wins ad revenue, and padding to split the difference
+loses both. Each script picks a lane deliberately.
+
+**Hashtags:** 3-5 total, mixing 1-2 broad with 2-3 niche. Relevance beats
+popularity; irrelevant tags weaken the topic signal.
+
+### Sources
+
+- [Creator Rewards requirements, RPM and the 1-minute rule](https://creatorsagency.co/blog/tiktok-creator-rewards-program-2026)
+- [What creators actually earn per view in 2026](https://stackinfluence.com/blog/tiktok-pay-per-view-what-creators-earn-in-2026)
+- [Monetization requirements across every program](https://flowshorts.app/blog/tiktok-monetization-requirements)
+- [Hashtag strategy: how many, broad vs niche](https://metricool.com/tiktok-hashtag-strategy-for-creators-who-want-consistent-growth/)
+- [Relevance over popularity](https://postlinkapp.com/blog/tiktok-hashtag-strategy-2026)
