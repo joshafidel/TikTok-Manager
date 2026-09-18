@@ -3,7 +3,7 @@
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db, channels, items, clips, performance } from "@/db";
 import type { Status } from "@/db/schema";
 import { generateIdeas, generateScript, GenerationError } from "./claude";
@@ -486,4 +486,32 @@ export async function scriptMyIdea(input: {
     refreshAll();
     return { error: errorMessage(err) };
   }
+}
+
+/**
+ * Throws away every idea currently on an account and draws a fresh ten.
+ *
+ * Changing a channel's profile only affects ideas written afterwards — the ones
+ * already sitting in the list keep the scripts they were born with. Without
+ * this the only way to see a profile change was to cross ten ideas off one at a
+ * time, which is why the scripts appeared never to update.
+ */
+export async function replaceAllIdeas(fd: FormData): Promise<void> {
+  const channelId = str(fd, "channelId");
+  if (!channelId) return;
+
+  // Archive rather than delete, so nothing written is lost for good.
+  await db
+    .update(items)
+    .set({ archived: true, updatedAt: now() })
+    .where(
+      and(
+        eq(items.channelId, channelId),
+        eq(items.archived, false),
+        inArray(items.status, ["idea", "scripted"]),
+      ),
+    );
+
+  await ensurePoolAction(channelId);
+  refreshAll();
 }

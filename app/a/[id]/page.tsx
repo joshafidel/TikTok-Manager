@@ -5,9 +5,9 @@ import { desc, eq } from "drizzle-orm";
 import { db, videos } from "@/db";
 import { getChannel } from "@/lib/queries";
 import { getPool, POOL_SIZE } from "@/lib/pool";
-import { crossOffIdea } from "@/lib/actions";
+import { crossOffIdea, replaceAllIdeas } from "@/lib/actions";
 import { RECORDING_TIPS } from "@/lib/playbook";
-import { CrossOffButton, MyIdeaBox, PoolFiller } from "@/components/pool-client";
+import { CrossOffButton, MyIdeaBox, PoolFiller, ReplaceAllButton } from "@/components/pool-client";
 import { VideoUploader } from "@/components/video-client";
 import { SectionHead } from "@/components/ui";
 
@@ -56,7 +56,18 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
       </section>
 
       <section>
-        <SectionHead num="01" title="Your ten ideas" />
+        <SectionHead
+          num="01"
+          title="Your ten ideas"
+          action={
+            pool.length > 0 ? (
+              <form action={replaceAllIdeas}>
+                <input type="hidden" name="channelId" value={channel.id} />
+                <ReplaceAllButton />
+              </form>
+            ) : undefined
+          }
+        />
         <MyIdeaBox channelId={channel.id} />
         <PoolFiller
           channelId={channel.id}

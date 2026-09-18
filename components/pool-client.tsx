@@ -179,3 +179,28 @@ export function MyIdeaBox({ channelId }: { channelId: string }) {
     </div>
   );
 }
+
+/** Confirms before throwing away the current ten, since it takes minutes to rebuild. */
+export function ReplaceAllButton() {
+  const { pending } = useFormStatus();
+  const [armed, setArmed] = useState(false);
+
+  if (!armed) {
+    return (
+      <button type="button" className="btn" onClick={() => setArmed(true)}>
+        Replace all ten
+      </button>
+    );
+  }
+
+  return (
+    <span className="flex flex-wrap items-center gap-2">
+      <button type="submit" className="btn btn-primary" disabled={pending}>
+        {pending ? "Writing ten new ones…" : "Yes, replace them"}
+      </button>
+      <button type="button" className="btn" onClick={() => setArmed(false)} disabled={pending}>
+        Cancel
+      </button>
+    </span>
+  );
+}
