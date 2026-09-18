@@ -1,4 +1,5 @@
 import { getChannels } from "@/lib/queries";
+import { buildInfo } from "@/lib/build-info";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -104,6 +105,8 @@ export default async function HealthPage() {
   const all = [checks[0], db, checks[1], checks[2], blob];
   const bad = all.filter((c) => c.state !== "ok");
 
+  const build = buildInfo();
+
   return (
     <div className="mx-auto max-w-2xl">
       <p className="label">Diagnostics</p>
@@ -113,7 +116,29 @@ export default async function HealthPage() {
         accepted them.
       </p>
 
-      <div className="card mt-5 overflow-hidden">
+      <div className="card mt-5 p-3">
+        <p className="label">This deployment</p>
+        <dl className="mt-2 grid grid-cols-[7rem_1fr] gap-x-3 gap-y-1 font-mono text-[0.7rem]">
+          <dt className="text-ink3">Commit</dt>
+          <dd className="tabular-nums">{build.shortCommit}</dd>
+          <dt className="text-ink3">Branch</dt>
+          <dd className="break-all">{build.branch}</dd>
+          <dt className="text-ink3">Environment</dt>
+          <dd>{build.env}</dd>
+          {build.message && (
+            <>
+              <dt className="text-ink3">Built from</dt>
+              <dd className="break-words">{build.message.split("\n")[0]}</dd>
+            </>
+          )}
+        </dl>
+        <p className="mt-2 border-t border-rulesoft pt-2 font-mono text-[0.62rem] leading-relaxed text-ink3">
+          If this commit is not the newest one pushed, you are looking at an older build — most
+          often because an earlier deployment was redeployed, or the newest build failed.
+        </p>
+      </div>
+
+      <div className="card mt-3 overflow-hidden">
         {all.map((c) => (
           <div key={c.name} className="flex items-start gap-3 border-b border-rulesoft p-3 last:border-b-0">
             <span
