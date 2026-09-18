@@ -33,6 +33,8 @@ export const channels = sqliteTable("channels", {
   formats: text("formats", { mode: "json" }).$type<Format[]>().notNull(),
   neverDo: text("never_do", { mode: "json" }).$type<string[]>().notNull(),
   cta: text("cta"),
+  /** What the product actually is. Marketing scripts are only as concrete as this. */
+  productNotes: text("product_notes"),
   scriptStyle: text("script_style").$type<ScriptStyle>().notNull(),
   cadencePerWeek: integer("cadence_per_week").notNull(),
   /** Warn when fewer than this many edited videos are banked. */

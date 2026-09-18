@@ -91,45 +91,50 @@ const reactionFormats: Format[] = [
 
 const tallyFormats: Format[] = [
   {
-    key: "i-polled",
-    name: "I polled my [place] about [thing]",
+    key: "wish-there-was",
+    name: "Don't you wish there was a way to…",
     description:
-      "Run a real poll in Tally, show the result. The demo and the video are the same thing.",
+      "Name a frustration the viewer has genuinely had, sit in it, then reveal that the fix exists and show it working.",
     structure:
-      "The question and why it's contested → show the poll going out → the result on screen → the surprise in the data → what you're asking next (CTA).",
+      "Open on the frustration itself, stated as something that happened to them this week — not a hypothetical → let it land, one beat of 'and there's no way to actually settle it' → 'there is' → show Tally doing exactly that thing on screen, in under ten seconds → the result appears → the ask.",
   },
   {
-    key: "build-in-public",
-    name: "Build in public",
-    description: "One real decision or problem from this week of building Tally.",
-    structure:
-      "The problem in one line → why the obvious fix was wrong → what you shipped → what you learned → what's next.",
-  },
-  {
-    key: "civic-take",
-    name: "The take, then the poll",
+    key: "watch-me-do-it",
+    name: "Watch me run one",
     description:
-      "A civic argument that ends by handing the question to the audience.",
+      "A real poll, created and sent and answered, start to finish on screen. The demo is the video.",
     structure:
-      "The claim → the strongest counter → why you still land where you land → 'I want the actual numbers' → poll CTA.",
+      "The question you're about to ask, and why it's contested → create it on screen, fast → send it → results coming in → what surprised you → 'you can run one in about twenty seconds'.",
   },
   {
-    key: "data-surprise",
+    key: "settle-it",
+    name: "Let's settle it",
+    description:
+      "An argument people in your area are actually having, ended with real numbers.",
+    structure:
+      "State both sides fairly, fast → 'everyone's guessing' → run it → the actual split → who was wrong, including you if you were → the ask.",
+  },
+  {
+    key: "how-you-do-it-now",
+    name: "How you're doing this now",
+    description:
+      "The painful current workaround — the group chat, the Facebook thread, the loudest person winning — against the thirty-second version.",
+    structure:
+      "Show the mess: 200 unread messages, a comment section, nobody counting → 'this is how we decide things' → cut to Tally → same question, answered, counted → hold on the result.",
+  },
+  {
+    key: "the-result",
     name: "The number that surprised me",
-    description: "Lead with a genuinely counterintuitive polling result.",
+    description:
+      "Lead with a genuinely counterintuitive result from a real poll, reveal the tool second.",
     structure:
-      "The number cold → what everyone assumes → the actual breakdown → the likely reason → run your own (CTA).",
+      "The number, cold, no setup → what everyone assumes instead → the breakdown → where the number came from → run your own.",
   },
 ];
 
-/**
- * Missions shipped in earlier versions. A channel still carrying one of these
- * has never been edited, so it is safe to replace with the current default —
- * that is how a profile correction reaches a database that was seeded before
- * the fix. A channel the user has edited keeps their wording.
- */
 export const SUPERSEDED_MISSIONS = new Set<string>([
   "Establish real credibility on AI by being consistently more precise than everyone else in the feed. This channel is the top of the funnel for Tally — a viewer who trusts the explanations is a viewer who will try the app.",
+  "Drive installs of Tally, a civic polling app. Judged on installs and poll creations, not views. A 4k-view video that converts beats a 90k-view video that does not.",
 ]);
 
 export const CHANNEL_SEED = [
@@ -197,20 +202,24 @@ export const CHANNEL_SEED = [
     handle: null,
     accent: "#1F7A5C",
     mission:
-      "Drive installs of Tally, a civic polling app. Judged on installs and poll creations, not views. A 4k-view video that converts beats a 90k-view video that does not.",
+      "Market Tally. Every video introduces the app to someone who has never heard of it and shows them why it is worth opening — by naming a frustration they have actually had and then showing the app solving it on screen. Judged on installs and polls created, not views: a 4k-view video that converts beats a 90k-view video that does not.",
     audience:
-      "Civically engaged people who argue about local issues online and are frustrated that nobody has real numbers. Skews toward people who already follow local politics.",
+      "People who argue about local issues in group chats and comment sections and are quietly frustrated that it never resolves anything — nobody counts, the loudest person wins. Most of them have never heard of Tally and are not looking for an app.",
     voice:
-      "Grounded, curious, allergic to punditry. Interested in what people actually think rather than in being right. Warm, not preachy. Treats disagreement as data.",
+      "Grounded, curious, allergic to punditry and to advertising voice. Sounds like someone showing a friend something useful, not like a brand. Interested in what people actually think rather than in being right. Warm, never preachy. Treats disagreement as data.",
     formats: tallyFormats,
     neverDo: [
+      "Opening with the product. Never 'introducing Tally', never 'check out my new app'. The frustration comes first and the app arrives as the answer to it — that order is the whole format.",
+      "Inventing a problem the viewer has not had. A frustration they do not recognise makes the reveal feel like an infomercial, which is the failure mode of this format.",
+      "Describing the app instead of showing it. Every video has the product on screen doing the actual thing, in seconds.",
+      "Faking a poll or its results. Real questions, real numbers, however unflattering.",
+      "Feature-listing. Nobody installs an app because it has features; they install it because they just watched it settle something.",
       "Partisan cheerleading — it halves the addressable audience and undercuts the premise that you want real numbers.",
-      "Feature-listing the app instead of showing it doing something interesting.",
-      "A CTA with no result attached. Always show the data first, then the ask.",
       "Manufactured outrage as a hook.",
-      "Posting on a schedule with nothing to say. This calendar follows the roadmap.",
     ],
     cta: "Run the poll yourself — link in bio.",
+    productNotes:
+      "Tally is a civic polling app. You write a question, send it out, and get a counted answer back instead of an argument.\n\nFILL THIS IN — every marketing script is only as concrete as what is written here. Replace this with the real details:\n- What exactly can someone do in the first 30 seconds of opening it?\n- Who answers a poll — anyone, people nearby, a group you invite?\n- What does the result actually look like on screen?\n- What does it do that a group chat poll or a Twitter poll does not?\n- What does it cost?\n- What is the single most impressive thing to show someone who has never seen it?",
     scriptStyle: "full" as const,
     cadencePerWeek: 3,
     targetDepth: 4,

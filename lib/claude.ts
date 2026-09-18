@@ -66,6 +66,9 @@ function channelSystem(channel: Channel): string {
     ``,
     `NEVER DO`,
     never,
+    channel.productNotes
+      ? `\nWHAT THE PRODUCT ACTUALLY IS\n${channel.productNotes}\n\nEvery claim must come from the above. Never invent a feature, a price, or a capability that is not written there — if something is missing, write around it rather than guessing.`
+      : ``,
     channel.cta ? `\nSTANDING CALL TO ACTION\n${channel.cta}` : ``,
     ``,
     CRAFT_PLAYBOOK,

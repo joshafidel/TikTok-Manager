@@ -147,6 +147,12 @@ export default async function ChannelPage({ params }: { params: Promise<{ id: st
             hint="One per line. This list does more work than any other field."
           />
           <Field label="Standing CTA" name="cta" defaultValue={channel.cta ?? ""} />
+          <Area
+            label="What the product is"
+            name="productNotes"
+            defaultValue={channel.productNotes ?? ""}
+            hint="Only for channels promoting something. Every claim in a marketing script comes from here — the more concrete, the better the scripts."
+          />
           <div className="grid grid-cols-2 gap-3">
             <Field
               label="Posts / week"
