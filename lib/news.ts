@@ -23,7 +23,8 @@ export async function getNewsDigest(channel: Channel): Promise<string> {
     max_tokens: 4000,
     thinking: { type: "adaptive" },
     output_config: { effort: "low" },
-    tools: [{ type: "web_search_20260209", name: "web_search", max_uses: 6 }],
+    // Six searches ran out before the list was full, which cut the digest short.
+    tools: [{ type: "web_search_20260209", name: "web_search", max_uses: 14 }],
     messages: [
       {
         role: "user",
