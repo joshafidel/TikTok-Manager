@@ -42,6 +42,33 @@ export async function ensurePool(channelId: string, target = POOL_SIZE) {
   const missing = target - pool.length;
   if (missing <= 0) return { added: 0 };
 
+  // A source channel collects accounts to pull material from, not scripts.
+  if (channel.mode === "sources") {
+    const { findSources } = await import("./sources");
+    const found = await findSources({
+      channel,
+      count: missing,
+      existing: pool.map((p) => p.handle ?? p.title).filter(Boolean) as string[],
+    });
+    if (!found.length) return { added: 0 };
+
+    await db.insert(items).values(
+      found.map((f) => ({
+        id: randomUUID(),
+        channelId,
+        title: f.handle,
+        handle: f.handle,
+        sourceUrl: f.url,
+        status: "scripted" as const,
+        premise: f.posts,
+        notes: `${f.whyItFits}\n\nFound on: ${f.foundAt}`,
+        createdAt: now(),
+        updatedAt: now(),
+      })),
+    );
+    return { added: found.length };
+  }
+
   const [recentTitles, topPerformers] = await Promise.all([
     getRecentTitles(channelId),
     getTopPerformers(channelId),
@@ -110,6 +137,8 @@ export async function unscripted(channelId: string): Promise<Item[]> {
 export async function writeNextScripts(channelId: string, batch = SCRIPT_BATCH) {
   const channel = await getChannel(channelId);
   if (!channel) return { written: 0, remaining: 0, error: "Channel not found." };
+
+  if (channel.mode === "sources") return { written: 0, remaining: 0 };
 
   const pending = await unscripted(channelId);
   if (!pending.length) return { written: 0, remaining: 0 };

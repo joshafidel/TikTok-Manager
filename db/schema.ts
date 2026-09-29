@@ -48,6 +48,12 @@ export const channels = sqliteTable("channels", {
   logo: text("logo"),
   /** Search the web for real, current material before writing ideas. */
   newsDriven: integer("news_driven", { mode: "boolean" }).notNull().default(false),
+  /**
+   * "scripts" fills the pool with video ideas and writes a script for each.
+   * "sources" fills it with real accounts to pull material from instead —
+   * some channels are bottlenecked on finding material, not on writing.
+   */
+  mode: text("mode").$type<"scripts" | "sources">().notNull().default("scripts"),
 });
 
 export const items = sqliteTable("items", {
@@ -72,6 +78,8 @@ export const items = sqliteTable("items", {
   postTime: text("post_time"),
   assetUrl: text("asset_url"),
   postUrl: text("post_url"),
+  handle: text("handle"),
+  sourceUrl: text("source_url"),
   clipId: text("clip_id"),
   notes: text("notes"),
   /** Ideas you typed in yourself, which sort above the generated ones. */

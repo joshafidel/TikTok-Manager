@@ -134,44 +134,44 @@ const streetFormats: Format[] = [
 
 const tallyFormats: Format[] = [
   {
-    key: "wish-there-was",
-    name: "Don't you wish there was a way to…",
+    key: "what-it-is",
+    name: "What Tally is",
     description:
-      "Name a frustration the viewer has genuinely had, sit in it, then reveal that the fix exists and show it working.",
+      "The plain introduction. Someone has never heard of it; by the end they know what it does and why it exists.",
     structure:
-      "Open on the frustration itself, stated as something that happened to them this week — not a hypothetical → let it land, one beat of 'and there's no way to actually settle it' → 'there is' → show Tally doing exactly that thing on screen, in under ten seconds → the result appears → the ask.",
+      "Open on the frustration of not being heard by your representatives → 'there's an app that measures exactly that' → name it → show the one-to-five rating on screen → show the district result appearing → the alignment score → what to do next.",
   },
   {
-    key: "watch-me-do-it",
-    name: "Watch me run one",
+    key: "the-alignment-score",
+    name: "The number nobody else shows you",
     description:
-      "A real poll, created and sent and answered, start to finish on screen. The demo is the video.",
+      "Introduce Tally through its one genuinely unusual feature: your rep's voting record measured against your district.",
     structure:
-      "The question you're about to ask, and why it's contested → create it on screen, fast → send it → results coming in → what surprised you → 'you can run one in about twenty seconds'.",
+      "Ask whether your rep votes the way your area actually thinks → 'nobody could answer that until now' → show the alignment score on screen → explain in one line that it comes from recorded votes, not statements → show a real official → invite them to look up theirs.",
   },
   {
-    key: "settle-it",
-    name: "Let's settle it",
+    key: "thirty-second-tour",
+    name: "The thirty-second tour",
     description:
-      "An argument people in your area are actually having, ended with real numbers.",
+      "Open the app and show what a first-time user actually sees and does.",
     structure:
-      "State both sides fairly, fast → 'everyone's guessing' → run it → the actual split → who was wrong, including you if you were → the ask.",
+      "'This is the whole app' → open it → pick a topic → rate it one to five → the district split appears → the party lenses → the bill and the recorded vote → 'that's it, that's the app'.",
   },
   {
-    key: "how-you-do-it-now",
-    name: "How you're doing this now",
+    key: "one-local-issue",
+    name: "One issue, start to finish",
     description:
-      "The painful current workaround — the group chat, the Facebook thread, the loudest person winning — against the thirty-second version.",
+      "Introduce Tally through a single real NYC issue the viewer already has an opinion about.",
     structure:
-      "Show the mess: 200 unread messages, a comment section, nobody counting → 'this is how we decide things' → cut to Tally → same question, answered, counted → hold on the result.",
+      "Name the issue — station bathrooms, broken AC, missing elevators, weekend shutdowns → 'everyone has an opinion and nowhere to put it' → open Tally on that exact topic → rate it → show where the district lands → show what the Council actually did → the ask.",
   },
   {
-    key: "the-result",
-    name: "The number that surprised me",
+    key: "the-privacy-answer",
+    name: "Who sees my answer",
     description:
-      "Lead with a genuinely counterintuitive result from a real poll, reveal the tool second.",
+      "The question that stops people installing, answered up front. An introduction built on trust.",
     structure:
-      "The number, cold, no setup → what everyone assumes instead → the breakdown → where the number came from → run your own.",
+      "'The first thing people ask is who sees this' → the answer: nobody, ever, including officials → show that results only appear as aggregates → one line on why an account exists at all → 'now here is what it does'.",
   },
 ];
 
@@ -261,9 +261,10 @@ export const CHANNEL_SEED = [
       "THE DELIVERY",
       "Your face is the product, not the clip. Crop so you are large in frame and the source is small. React across the whole clip rather than watching in silence — the commentary is also what makes it transformative rather than a repost, which is what stops it being pulled for copyright.",
     ].join("\n"),
+    mode: "sources" as const,
     scriptStyle: "beats" as const,
     cadencePerWeek: 6,
-    targetDepth: 8,
+    targetDepth: 10,
     recordDays: [2],
     sortOrder: 4,
   },

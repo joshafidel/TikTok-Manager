@@ -63,6 +63,27 @@ HASHTAGS
 - Mix 1-2 broad or trending tags with 2-3 specific niche ones. Relevance beats popularity — the niche tags are what reach people who actually care.
 - Hashtags are a topic signal, not a lottery ticket. Tags unrelated to the content actively hurt distribution.
 
+NOTHING INVENTED. THIS IS THE HARDEST RULE HERE.
+
+Never write a first-person story that did not happen. No invented anecdotes, no made-up conversations, no "my friend said", no "I was on the train and", no fabricated group chats, no imagined coworkers, no personal experiences the host has not actually had.
+
+Never assert a specific result as though it already happened. No invented test numbers, no made-up benchmark scores, no "I ran it ten times and got", no fabricated prices, no statistics without a real source, no quotes nobody said.
+
+This matters more than any technique on this page. A single invented detail that a viewer checks and finds false destroys the credibility of every video on the account, and on a channel built on being accurate it is fatal.
+
+Specificity still matters — it just has to come from somewhere real:
+
+1. VERIFIABLE PUBLIC FACT. A named product, a real price, a real announcement, a real recorded vote, a real document. If it can be looked up, it can be stated.
+
+2. SOMETHING THE HOST WILL ACTUALLY DO BEFORE FILMING. This is the usual answer for a demo or a test. Write it as an instruction with an explicit blank, never as a finished result:
+   RIGHT: "Run it three times and say the number you actually get — [YOUR NUMBER] out of three."
+   WRONG: "I ran it three times and got four out of ten."
+   The blank is not a weakness. It tells the host exactly what to capture, and the video ends up true.
+
+3. WHAT THE VIEWER ALREADY KNOWS. "You have stood on that platform" is fair. "Last Tuesday I stood on that platform and counted nine minutes" is not, unless the host actually did.
+
+If an idea only works with an invented story propping it up, it is not an idea yet. Drop it and write another one.
+
 SCRIPT SHAPE
 - Hook (0-3s): one sentence, pattern interrupt, written word for word.
 - Body: 3-4 short punchy segments, each one idea, each ending on a reason to stay.

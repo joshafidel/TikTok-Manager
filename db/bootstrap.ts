@@ -18,5 +18,8 @@ export const BOOTSTRAP_DDL: string[] = [
   "ALTER TABLE `items` ADD `from_user` integer DEFAULT false NOT NULL;",
   "ALTER TABLE `channels` ADD `news_driven` integer DEFAULT false NOT NULL;",
   "ALTER TABLE `channels` ADD `product_notes` text;",
-  "ALTER TABLE `channels` ADD `style_notes` text;"
+  "ALTER TABLE `channels` ADD `style_notes` text;",
+  "ALTER TABLE `channels` ADD `mode` text DEFAULT 'scripts' NOT NULL;",
+  "ALTER TABLE `items` ADD `handle` text;",
+  "ALTER TABLE `items` ADD `source_url` text;"
 ];

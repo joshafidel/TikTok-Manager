@@ -7,7 +7,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { db, channels, items, clips, performance } from "@/db";
 import type { Status } from "@/db/schema";
 import { generateIdeas, generateScript, GenerationError } from "./claude";
-import { getChannel, getClip, getItem, getRecentTitles, getTopPerformers } from "./queries";
+import { getChannel, getChannels, getClip, getItem, getRecentTitles, getTopPerformers } from "./queries";
 import { todayISO } from "./dates";
 
 function now() {
@@ -514,5 +514,26 @@ export async function replaceAllIdeas(fd: FormData): Promise<void> {
     );
 
   await ensurePoolAction(channelId);
+  refreshAll();
+}
+
+/** Clears every channel and redraws from scratch. Used after a profile overhaul. */
+export async function replaceEverything(): Promise<void> {
+  const all = await getChannels();
+  for (const channel of all) {
+    await db
+      .update(items)
+      .set({ archived: true, updatedAt: now() })
+      .where(
+        and(
+          eq(items.channelId, channel.id),
+          eq(items.archived, false),
+          inArray(items.status, ["idea", "scripted"]),
+        ),
+      );
+  }
+  // Only the first channel is refilled here; the rest fill when opened, which
+  // keeps this click from waiting on four rounds of generation.
+  if (all[0]) await ensurePoolAction(all[0].id);
   refreshAll();
 }

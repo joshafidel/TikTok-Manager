@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { getChannels } from "@/lib/queries";
 import { getPool, POOL_SIZE } from "@/lib/pool";
+import { replaceEverything } from "@/lib/actions";
+import { ReplaceAllButton } from "@/components/pool-client";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +21,11 @@ export default async function AccountsPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <form action={replaceEverything} className="mb-5">
+        <ReplaceAllButton label="Start every channel over" confirm="Yes, clear them all" />
+      </form>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {channels.map((channel, i) => {
           const ready = pools[i].filter((p) => p.script).length;
           return (
@@ -48,7 +54,9 @@ export default async function AccountsPage() {
               )}
               <span className="mt-4 text-base font-semibold">{channel.name}</span>
               <span className="label mt-2">
-                {ready} / {POOL_SIZE} scripts ready
+                {channel.mode === "sources"
+                  ? `${pools[i].length} accounts`
+                  : `${ready} / ${POOL_SIZE} scripts ready`}
               </span>
             </Link>
           );
