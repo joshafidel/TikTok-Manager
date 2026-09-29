@@ -1,0 +1,1 @@
+ALTER TABLE `channels` ADD `style_notes` text;

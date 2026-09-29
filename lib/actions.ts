@@ -300,6 +300,7 @@ export async function updateChannel(fd: FormData) {
       voice: str(fd, "voice") ?? undefined,
       cta: str(fd, "cta"),
       productNotes: str(fd, "productNotes"),
+      styleNotes: str(fd, "styleNotes"),
       neverDo: (str(fd, "neverDo") ?? "")
         .split("\n")
         .map((l) => l.replace(/^[-*]\s*/, "").trim())

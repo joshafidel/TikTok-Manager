@@ -77,6 +77,7 @@ async function refreshUntouchedProfiles(): Promise<void> {
         neverDo: row.neverDo,
         newsDriven: row.newsDriven ?? false,
         productNotes: row.productNotes ?? null,
+        styleNotes: row.styleNotes ?? null,
       })
       .where(eq(channels.id, row.id));
   }

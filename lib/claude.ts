@@ -66,6 +66,9 @@ function channelSystem(channel: Channel): string {
     ``,
     `NEVER DO`,
     never,
+    channel.styleNotes
+      ? `\nCRAFT TO BORROW FROM\n${channel.styleNotes}`
+      : ``,
     channel.productNotes
       ? `\nWHAT THE PRODUCT ACTUALLY IS\n${channel.productNotes}\n\nEvery claim must come from the above. Never invent a feature, a price, or a capability that is not written there — if something is missing, write around it rather than guessing.`
       : ``,
@@ -176,8 +179,14 @@ const ScriptSchema = z.object({
     .string()
     .describe("The closing line, written to send the viewer back to the opening frame"),
   shotNotes: z.string().describe("What to film or capture on screen, as markdown bullets"),
-  caption: z.string().describe("The TikTok caption"),
-  hashtags: z.array(z.string()).describe("Hashtags without the # prefix"),
+  caption: z
+    .string()
+    .min(1)
+    .describe("The TikTok caption. Required — never return this empty."),
+  hashtags: z
+    .array(z.string())
+    .min(3)
+    .describe("3-5 hashtags without the # prefix, mixing broad reach with niche relevance"),
 });
 
 export type GeneratedScript = z.infer<typeof ScriptSchema>;

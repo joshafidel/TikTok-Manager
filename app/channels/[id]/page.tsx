@@ -148,6 +148,12 @@ export default async function ChannelPage({ params }: { params: Promise<{ id: st
           />
           <Field label="Standing CTA" name="cta" defaultValue={channel.cta ?? ""} />
           <Area
+            label="Craft to borrow from"
+            name="styleNotes"
+            defaultValue={channel.styleNotes ?? ""}
+            hint="Creators whose technique this channel draws on. Describe what they do well, not who they are."
+          />
+          <Area
             label="What the product is"
             name="productNotes"
             defaultValue={channel.productNotes ?? ""}

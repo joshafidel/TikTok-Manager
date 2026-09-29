@@ -35,6 +35,8 @@ export const channels = sqliteTable("channels", {
   cta: text("cta"),
   /** What the product actually is. Marketing scripts are only as concrete as this. */
   productNotes: text("product_notes"),
+  /** Creators whose craft this channel borrows from — technique, not imitation. */
+  styleNotes: text("style_notes"),
   scriptStyle: text("script_style").$type<ScriptStyle>().notNull(),
   cadencePerWeek: integer("cadence_per_week").notNull(),
   /** Warn when fewer than this many edited videos are banked. */

@@ -133,6 +133,7 @@ const tallyFormats: Format[] = [
 ];
 
 export const SUPERSEDED_MISSIONS = new Set<string>([
+  "Keep people current on AI. Real news, real tools, real applications — what actually happened, what it means, and what is worth opening today. Credibility comes from being accurate and specific about things that genuinely exist, faster than the people around them. This is the channel brands in the AI space pay to be next to, and the top of the funnel for Tally.",
   "Establish real credibility on AI by being consistently more precise than everyone else in the feed. This channel is the top of the funnel for Tally — a viewer who trusts the explanations is a viewer who will try the app.",
   "Drive installs of Tally, a civic polling app. Judged on installs and poll creations, not views. A 4k-view video that converts beats a 90k-view video that does not.",
 ]);
@@ -145,7 +146,7 @@ export const CHANNEL_SEED = [
     handle: null,
     accent: "#2A62A8",
     mission:
-      "Keep people current on AI. Real news, real tools, real applications — what actually happened, what it means, and what is worth opening today. Credibility comes from being accurate and specific about things that genuinely exist, faster than the people around them. This is the channel brands in the AI space pay to be next to, and the top of the funnel for Tally.",
+      "Break real AI news. Every video starts from an actual headline from the last few days — what happened, why it matters, and what the viewer should do about it. Also covers tools and sites worth opening today. Credibility comes from being accurate, specific and fast about things that genuinely exist. This is the channel brands in the AI space pay to be next to, and the top of the funnel for Tally.",
     audience:
       "Curious non-experts and early-career technical people who want to stay current without reading twenty newsletters. They feel behind, they are tired of hype and doom, and they can tell immediately when someone is describing something they have not actually used.",
     voice:
@@ -161,6 +162,20 @@ export const CHANNEL_SEED = [
       "Covering a paper you have not read past the abstract, or a story you have only seen summarised.",
     ],
     cta: null,
+    styleNotes: [
+      "Three creators to borrow craft from. Study the technique, never imitate the person — no catchphrases, no borrowed bits, no pretending to be them.",
+      "",
+      "KALLAWAY (@kanekallaway) — structure.",
+      "He treats the first three seconds as the whole video, then never lets the tension close. One hook is not enough: each segment opens a new curiosity loop before the last one resolves, so there is always an unanswered question pulling the viewer forward. Complex tech gets made accessible without being dumbed down, and every breakdown lands on something the viewer can actually use. Take from him: the layered curiosity loops, and the discipline of never explaining something the viewer did not ask to know.",
+      "",
+      "DYLAN PAGE (@dylan.page) — delivery and pace.",
+      "News told with energy and personality rather than authority. Brisk, warm, genuinely interested — the tone of someone who just found out and had to tell you, not a presenter reading a bulletin. He makes a complicated or surprising story feel immediately graspable, and leaves room for the viewer to have an opinion, which is why his videos get argued with rather than scrolled past. Take from him: the pace, the enthusiasm, and ending on something people want to reply to.",
+      "",
+      "WILL FRANCIS (@willfrancis24) — substance and honesty.",
+      "Hype-free and genuinely useful. Explains AI so a normal person leaves with something they can do, not a feeling that the future is scary or amazing. No breathlessness, no doom. Take from him: the refusal to hype, and the rule that a viewer should be able to act on the video within a day.",
+      "",
+      "The combination: Kallaway's structure, Dylan Page's energy, Will Francis's honesty. Fast and warm, built on curiosity loops, and never overselling what actually happened.",
+    ].join("\n"),
     scriptStyle: "full" as const,
     cadencePerWeek: 4,
     targetDepth: 6,
