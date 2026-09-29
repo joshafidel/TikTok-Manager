@@ -56,12 +56,52 @@ async function probe(
   }
 }
 
-export default async function HealthPage() {
-  const shotstackBase =
-    process.env.SHOTSTACK_ENV === "production"
-      ? "https://api.shotstack.io/edit/v1"
-      : "https://api.shotstack.io/edit/stage";
+/**
+ * Shotstack hands out two keys — sandbox and production — and each endpoint
+ * refuses the other's. Try both and say which one this key belongs to, so a
+ * mismatched key reads as "you pasted the other one" and not "broken".
+ */
+async function shotstackCheck(): Promise<Check> {
+  const need = "SHOTSTACK_API_KEY";
+  const apiKey = process.env.SHOTSTACK_API_KEY;
+  if (!apiKey) {
+    return { name: "Shotstack", need, state: "missing", detail: `${need} is not set.` };
+  }
 
+  const endpoints = [
+    ["sandbox", "https://api.shotstack.io/edit/stage"],
+    ["production", "https://api.shotstack.io/edit/v1"],
+  ] as const;
+
+  for (const [label, url] of endpoints) {
+    try {
+      const res = await fetch(`${url}/templates`, {
+        headers: { "x-api-key": apiKey },
+        signal: AbortSignal.timeout(TIMEOUT),
+      });
+      if (res.status !== 401 && res.status !== 403) {
+        return {
+          name: "Shotstack",
+          need,
+          state: "ok",
+          detail: `Key accepted — this is a ${label} key, and the app is using it.`,
+        };
+      }
+    } catch {
+      // Try the other endpoint before concluding anything.
+    }
+  }
+
+  return {
+    name: "Shotstack",
+    need,
+    state: "bad-key",
+    detail:
+      "Refused on both the sandbox and production endpoints, so this key is not valid for either. Copy a fresh one from the Shotstack dashboard.",
+  };
+}
+
+export default async function HealthPage() {
   const checks = await Promise.all([
     probe("Anthropic", "ANTHROPIC_API_KEY", process.env.ANTHROPIC_API_KEY, "https://api.anthropic.com/v1/models?limit=1", {
       "x-api-key": process.env.ANTHROPIC_API_KEY ?? "",
@@ -70,9 +110,7 @@ export default async function HealthPage() {
     probe("AssemblyAI", "ASSEMBLYAI_API_KEY", process.env.ASSEMBLYAI_API_KEY, "https://api.assemblyai.com/v2/transcript?limit=1", {
       authorization: process.env.ASSEMBLYAI_API_KEY ?? "",
     }),
-    probe("Shotstack", "SHOTSTACK_API_KEY", process.env.SHOTSTACK_API_KEY, `${shotstackBase}/templates`, {
-      "x-api-key": process.env.SHOTSTACK_API_KEY ?? "",
-    }),
+    shotstackCheck(),
   ]);
 
   let db: Check;
