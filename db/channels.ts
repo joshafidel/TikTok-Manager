@@ -89,6 +89,49 @@ const reactionFormats: Format[] = [
   },
 ];
 
+const streetFormats: Format[] = [
+  {
+    key: "confident-correction",
+    name: "The confident correction",
+    description:
+      "They answer correctly. You tell them, completely calmly, that they are wrong — and give a wrong answer with total certainty.",
+    structure:
+      "Ask the question → they get it right → half a beat of nothing → 'ooh, so close' → deliver the false answer flatly, like it is common knowledge → hold on their face while they recalculate → button.",
+  },
+  {
+    key: "fake-specifics",
+    name: "Too many details to argue with",
+    description:
+      "They push back, so you escalate — not by insisting, but by adding invented specifics that sound checkable.",
+    structure:
+      "They say 'no, I'm pretty sure' → agree that it is a common mistake → add a fake year, a fake source, a fake person's name → watch the confidence drain → let them go quiet → button.",
+  },
+  {
+    key: "crowd-turn",
+    name: "Asking someone else",
+    description:
+      "Turn to a second stranger, who either backs the wrong answer or makes it worse.",
+    structure:
+      "'Let's settle it' → turn to a bystander → they side with the wrong answer, or give a third answer that is worse → cut to the first person's face → button.",
+  },
+  {
+    key: "slow-doubt",
+    name: "Watching them fold",
+    description:
+      "Say nothing more and let them talk themselves out of the answer they already knew.",
+    structure:
+      "One quiet 'are you sure?' → do not fill the silence → they start reasoning out loud and walk backwards → the moment they change their answer → button.",
+  },
+  {
+    key: "the-reveal",
+    name: "Telling them the truth",
+    description:
+      "You were right the whole time. The payoff is their reaction to being let off.",
+    structure:
+      "Let it sit one beat too long → 'you were right, I was messing with you' → their reaction, uncut → the handshake or the shove → button.",
+  },
+];
+
 const tallyFormats: Format[] = [
   {
     key: "wish-there-was",
@@ -133,6 +176,9 @@ const tallyFormats: Format[] = [
 ];
 
 export const SUPERSEDED_MISSIONS = new Set<string>([
+  "Break real AI news. Every video starts from an actual headline from the last few days — what happened, why it matters, and what the viewer should do about it. Also covers tools and sites worth opening today. Credibility comes from being accurate, specific and fast about things that genuinely exist. This is the channel brands in the AI space pay to be next to, and the top of the funnel for Tally.",
+  "Volume and reach. Dramatic, funny reactions to absurdly gross Instagram reels. This is the channel that grows fastest and costs the least to make.",
+  "Market Tally. Every video introduces the app to someone who has never heard of it and shows them why it is worth opening — by naming a frustration they have actually had and then showing the app solving it on screen. Judged on installs and polls created, not views: a 4k-view video that converts beats a 90k-view video that does not.",
   "Keep people current on AI. Real news, real tools, real applications — what actually happened, what it means, and what is worth opening today. Credibility comes from being accurate and specific about things that genuinely exist, faster than the people around them. This is the channel brands in the AI space pay to be next to, and the top of the funnel for Tally.",
   "Establish real credibility on AI by being consistently more precise than everyone else in the feed. This channel is the top of the funnel for Tally — a viewer who trusts the explanations is a viewer who will try the app.",
   "Drive installs of Tally, a civic polling app. Judged on installs and poll creations, not views. A 4k-view video that converts beats a 90k-view video that does not.",
@@ -142,7 +188,7 @@ export const CHANNEL_SEED = [
   {
     id: "ai",
     logo: "/logos/ai-with-receipts.png",
-    name: "AI, with receipts",
+    name: "AI News",
     handle: null,
     accent: "#2A62A8",
     mission:
@@ -186,11 +232,11 @@ export const CHANNEL_SEED = [
   {
     id: "reactions",
     logo: "/logos/reactions.png",
-    name: "Reactions",
+    name: "Instagram Reels Reactions",
     handle: null,
     accent: "#71469E",
     mission:
-      "Volume and reach. Dramatic, funny reactions to absurdly gross Instagram reels. This is the channel that grows fastest and costs the least to make.",
+      "Volume and reach. Dramatic, funny reactions to the most absurd and grotesque corners of Instagram Reels — the food crimes, the unhinged thirst-trap monologues, the things that should not have been filmed. Fastest to grow and cheapest to make, and the channel that feeds followers to the other three.",
     audience:
       "People who watch reaction content late at night and want a host whose reaction is bigger and funnier than their own. They are here for the delivery, not the clip.",
     voice:
@@ -204,11 +250,54 @@ export const CHANNEL_SEED = [
       "Explaining the joke after the button line.",
     ],
     cta: null,
+    styleNotes: [
+      "WHERE THE MATERIAL COMES FROM",
+      "The clip queue is the bottleneck, not the writing. Stock it from the corners that reliably produce: unhinged thirst-trap monologues where someone says something genuinely deranged with total confidence, food crimes and impossible-texture cooking, home renovation and DIY that defies physics, mukbang gone wrong, and the pages that exist purely to bait a reaction.",
+      "Save them to a collection as you find them, and log the link plus a one-line premise here the same day. Never go looking on a record day.",
+      "",
+      "ONE CATEGORY TO LEAVE ALONE — real fights and real violence.",
+      "TikTok explicitly prohibits real-world physical violence and fighting as shocking content, and content that breaks the guidelines is disqualified from earning and from brand deals. Since the point of these accounts is money, a fight clip costs more than it returns: the video is suppressed, the post earns nothing, and repeated strikes take the account down. Gross, absurd, and unhinged all monetise. Violent does not.",
+      "",
+      "THE DELIVERY",
+      "Your face is the product, not the clip. Crop so you are large in frame and the source is small. React across the whole clip rather than watching in silence — the commentary is also what makes it transformative rather than a repost, which is what stops it being pulled for copyright.",
+    ].join("\n"),
     scriptStyle: "beats" as const,
     cadencePerWeek: 6,
     targetDepth: 8,
     recordDays: [2],
+    sortOrder: 4,
+  },
+  {
+    id: "streettalk",
+    logo: "/logos/streettalk.png",
+    name: "Street Talk",
+    handle: null,
+    accent: "#C2571E",
+    mission:
+      "Stop strangers on the street, ask them an easy trivia question, and when they get it right, insist with total confidence that they are wrong. The comedy is the flat certainty and the face they make while they recalculate — never the person. Fast to make, endlessly repeatable, and the format people send to a friend, which is the signal that grows an account.",
+    audience:
+      "People who watch street-interview and prank content and stay for the reaction shot. They are on your side, not the stranger's, but they turn on a host who is actually cruel.",
+    voice:
+      "Deadpan and friendly. Utterly sure of something completely wrong, delivered as casually as the weather. Never smug, never mocking — you are not laughing at them, you are holding a straight face. The warmer you are, the funnier the lie.",
+    formats: streetFormats,
+    neverDo: [
+      "Punching down. Never pick someone who is drunk, distressed, unhoused, a child, or struggling with the language. The bit only works on someone comfortably able to push back.",
+      "Leaving without the reveal. Always tell them the truth on camera before you go — that is the payoff, and it is what keeps this a joke rather than a nasty trick.",
+      "Posting anyone who asks you not to. Get a clear yes on camera. One person's bad day is not worth a video.",
+      "Questions where being wrong is humiliating rather than funny. Keep it capitals, spelling, simple history — nothing that makes someone look uneducated about their own life.",
+      "Real politics, religion, or anything someone could be doxxed over.",
+      "Arguing. The moment it stops being funny and becomes a real disagreement, you drop it and reveal.",
+    ],
+    cta: null,
+    productNotes: null,
+    styleNotes:
+      "The whole format lives in the pause. Ask, let them answer, and then do nothing for a full beat before you correct them — the silence is what makes the correction land and what makes the clip rewatchable. Shoot so their face is the subject, not yours: you can be off-camera entirely. Keep your own delivery low-energy; their reaction supplies all the energy the video needs.",
+    scriptStyle: "beats" as const,
+    cadencePerWeek: 5,
+    targetDepth: 8,
+    recordDays: [6],
     sortOrder: 2,
+    newsDriven: false,
   },
   {
     id: "tally",
@@ -217,7 +306,7 @@ export const CHANNEL_SEED = [
     handle: null,
     accent: "#1F7A5C",
     mission:
-      "Market Tally. Every video introduces the app to someone who has never heard of it and shows them why it is worth opening — by naming a frustration they have actually had and then showing the app solving it on screen. Judged on installs and polls created, not views: a 4k-view video that converts beats a 90k-view video that does not.",
+      "Market Tally. Open on a frustration the viewer already has about being ignored by the people who represent them — \"aren't you tired of your representatives not listening to you?\" — then show the app answering it on screen. The alignment score is the payoff almost every time, because it is the literal measurement of whether your rep votes the way your district actually thinks. Judged on installs and polls created, not views: a 4k-view video that converts beats a 90k-view video that does not.",
     audience:
       "People who argue about local issues in group chats and comment sections and are quietly frustrated that it never resolves anything — nobody counts, the loudest person wins. Most of them have never heard of Tally and are not looking for an app.",
     voice:
@@ -233,8 +322,33 @@ export const CHANNEL_SEED = [
       "Manufactured outrage as a hook.",
     ],
     cta: "Run the poll yourself — link in bio.",
-    productNotes:
-      "Tally is a civic polling app. You write a question, send it out, and get a counted answer back instead of an argument.\n\nFILL THIS IN — every marketing script is only as concrete as what is written here. Replace this with the real details:\n- What exactly can someone do in the first 30 seconds of opening it?\n- Who answers a poll — anyone, people nearby, a group you invite?\n- What does the result actually look like on screen?\n- What does it do that a group chat poll or a Twitter poll does not?\n- What does it cost?\n- What is the single most impressive thing to show someone who has never seen it?",
+    productNotes: [
+      "Tally is a civic app. You weigh in on issues, bills and officials on a 1 to 5 scale, and it shows how your district actually leans — then lines that up against how your representatives actually voted.",
+      "",
+      "THE THING THAT MAKES IT DIFFERENT — the alignment score.",
+      "It compares how an official really voted on an issue against how their district really weighed in on that same issue. High alignment means their record tracks their constituents. Low means it does not. It is computed from recorded votes, not from what they say. This is the feature to lead with: it is the answer to 'my rep does not listen to me', and nothing else on a phone does it.",
+      "",
+      "WHAT YOU CAN DO IN THE FIRST THIRTY SECONDS",
+      "Open it, pick a topic you have an opinion about, rate it 1 to 5, and immediately see how your district, each party and the country split on it.",
+      "",
+      "WHAT IS IN IT",
+      "- Real bills with plain-English summaries, sponsor, and current status — passed committee, stalled, on the floor.",
+      "- Real recorded votes from Congress.gov, the New York State Senate, and the NYC Council. Refreshed every hour.",
+      "- Approval: a separate 1 to 5 on the official themselves, shown as a distribution.",
+      "- Lenses: see results broken down by party and by area.",
+      "",
+      "PRIVACY, which matters because people ask",
+      "Individual answers are never shown to anyone, including officials. You only ever appear inside aggregates, and aggregates only appear once enough people have weighed in that nobody is identifiable. An account exists so each person counts once, in the right district. Settings has Download my data and Clear activity, and emailing the address on the privacy page deletes everything.",
+      "",
+      "IT TAKES NO SIDES",
+      "Tally does not hold positions. Everyone sees the same distributions, computed the same way. Red and blue only ever mark Republican and Democrat.",
+      "",
+      "WHERE IT IS STRONGEST RIGHT NOW",
+      "New York City. The local topics are the sharp ones: subway cleanliness, station bathrooms, broken AC, missing elevators, delays, fare gates, weekend shutdowns, platform barriers, policing. Those are the pain points to build videos on, because everyone in the city has an opinion already formed and no way to register it.",
+      "",
+      "HONEST LIMIT — say this rather than hide it",
+      "Where the community is still small, the app says so instead of inventing numbers. Bills, votes and official records are always real.",
+    ].join("\n"),
     scriptStyle: "full" as const,
     cadencePerWeek: 3,
     targetDepth: 4,

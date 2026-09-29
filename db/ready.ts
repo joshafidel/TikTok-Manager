@@ -65,19 +65,33 @@ async function refreshUntouchedProfiles(): Promise<void> {
 
   for (const row of CHANNEL_SEED) {
     const current = existing.find((c) => c.id === row.id);
-    if (!current || !SUPERSEDED_MISSIONS.has(current.mission)) continue;
+
+    // A channel added after this database was seeded has to be inserted, or it
+    // would never appear on an instance that is already running.
+    if (!current) {
+      await db.insert(channels).values(row).onConflictDoNothing();
+      continue;
+    }
+
+    if (!SUPERSEDED_MISSIONS.has(current.mission)) continue;
 
     await db
       .update(channels)
       .set({
+        // Renaming a channel has to reach existing databases too.
+        name: row.name,
         mission: row.mission,
         audience: row.audience,
         voice: row.voice,
         formats: row.formats,
         neverDo: row.neverDo,
         newsDriven: row.newsDriven ?? false,
+        cta: row.cta ?? null,
         productNotes: row.productNotes ?? null,
         styleNotes: row.styleNotes ?? null,
+        scriptStyle: row.scriptStyle,
+        sortOrder: row.sortOrder,
+        logo: row.logo,
       })
       .where(eq(channels.id, row.id));
   }
