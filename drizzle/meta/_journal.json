@@ -71,6 +71,13 @@
       "when": 1790717805492,
       "tag": "0009_misty_blindfold",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1790797520595,
+      "tag": "0010_powerful_vertigo",
+      "breakpoints": true
     }
   ]
 }

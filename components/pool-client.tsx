@@ -16,10 +16,13 @@ export function PoolFiller({
   channelId,
   missingIdeas,
   missingScripts,
+  staleCount = 0,
 }: {
   channelId: string;
   missingIdeas: number;
   missingScripts: number;
+  /** Entries written under older rules, which are cleared as part of the refill. */
+  staleCount?: number;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -79,10 +82,15 @@ export function PoolFiller({
         </>
       ) : (
         <>
-          <p className="label !text-[var(--tally)]">Writing your scripts</p>
+          <p className="label !text-[var(--tally)]">
+            {staleCount > 0 ? "Bringing this channel up to date" : "Writing your scripts"}
+          </p>
           <p className="mt-1.5 text-sm text-ink2">
-            {left > 0 ? `${left} still to write.` : "Working…"} You can start reading the ones
-            below — they appear as they finish.
+            {staleCount > 0
+              ? `${staleCount} ${staleCount === 1 ? "entry was" : "entries were"} written under older instructions. Clearing them and writing replacements now.`
+              : left > 0
+                ? `${left} still to write. You can start reading the ones below — they appear as they finish.`
+                : "Working…"}
           </p>
           <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-surface2">
             <div className="h-full w-1/3 animate-pulse rounded-full bg-[var(--tally)]" />

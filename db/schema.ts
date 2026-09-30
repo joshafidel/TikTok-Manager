@@ -84,6 +84,12 @@ export const items = sqliteTable("items", {
   notes: text("notes"),
   /** Ideas you typed in yourself, which sort above the generated ones. */
   fromUser: integer("from_user", { mode: "boolean" }).notNull().default(false),
+  /**
+   * Fingerprint of the channel profile this was written under. When the profile
+   * changes the fingerprint changes, which is how the app knows an idea was
+   * written to rules that no longer apply.
+   */
+  profileVersion: text("profile_version"),
   archived: integer("archived", { mode: "boolean" }).notNull().default(false),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),

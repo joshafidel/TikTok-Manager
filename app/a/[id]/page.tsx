@@ -5,6 +5,7 @@ import { desc, eq } from "drizzle-orm";
 import { db, videos } from "@/db";
 import { getChannel } from "@/lib/queries";
 import { getPool, POOL_SIZE } from "@/lib/pool";
+import { profileVersion } from "@/lib/profile-version";
 import { crossOffIdea, replaceAllIdeas } from "@/lib/actions";
 import { RECORDING_TIPS } from "@/lib/playbook";
 import { CrossOffButton, MyIdeaBox, PoolFiller, ReplaceAllButton } from "@/components/pool-client";
@@ -22,6 +23,12 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
 
   const pool = await getPool(id);
   const isSources = channel.mode === "sources";
+
+  // Anything written under an older version of this channel's rules is stale.
+  // Surfacing that here is what makes the refill start on its own, instead of
+  // waiting for someone to notice the list is out of date.
+  const version = profileVersion(channel);
+  const stale = pool.filter((p) => !p.fromUser && p.profileVersion !== version);
   const scripted = pool.filter((p) => (isSources ? true : p.script));
   const edits = await db
     .select()
@@ -74,7 +81,8 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
         {!isSources && <MyIdeaBox channelId={channel.id} />}
         <PoolFiller
           channelId={channel.id}
-          missingIdeas={Math.max(0, POOL_SIZE - pool.length)}
+          missingIdeas={stale.length > 0 ? POOL_SIZE : Math.max(0, POOL_SIZE - pool.length)}
+          staleCount={stale.length}
           missingScripts={isSources ? 0 : pool.length - scripted.length}
         />
 
@@ -115,6 +123,11 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
                     <>
                       <h3 className="text-base font-semibold leading-snug">{item.title}</h3>
                       {item.fromUser && <span className="label mt-1 block">Your idea</span>}
+                      {stale.some((x) => x.id === item.id) && (
+                        <span className="label mt-1 block !text-[var(--tally)]">
+                          Written under older instructions — being replaced
+                        </span>
+                      )}
 
                       {item.hook && (
                         <p className="mt-2 border-l-2 border-[var(--tally)] pl-3 text-[0.95rem] font-medium italic leading-snug">
