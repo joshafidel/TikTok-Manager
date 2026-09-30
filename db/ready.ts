@@ -2,6 +2,10 @@ import { eq, sql } from "drizzle-orm";
 import { db, channels } from "./index";
 import { BOOTSTRAP_DDL } from "./bootstrap";
 import { CHANNEL_SEED, SUPERSEDED_MISSIONS } from "./channels";
+import { SEED_CONTENT } from "./seed-content";
+import { items } from "./schema";
+import { profileVersion } from "@/lib/profile-version";
+import { randomUUID } from "node:crypto";
 
 /**
  * First-run setup, done by the app itself.
@@ -48,10 +52,55 @@ async function bootstrap(): Promise<void> {
     for (const row of CHANNEL_SEED) {
       await db.insert(channels).values(row).onConflictDoNothing();
     }
-    return;
+  } else {
+    await refreshUntouchedProfiles();
   }
 
-  await refreshUntouchedProfiles();
+  // Runs on both paths. Returning early after seeding channels meant a fresh
+  // database never received any of this content.
+  await installSeedContent();
+}
+
+/**
+ * Puts content written in conversation into the database.
+ *
+ * Inserted once per entry and matched on title, so redeploying does not
+ * duplicate anything and an entry the user has deleted stays deleted. Stamped
+ * with the current profile, so it ages out under the same rules as generated
+ * work rather than being privileged.
+ */
+async function installSeedContent(): Promise<void> {
+  if (!SEED_CONTENT.length) return;
+
+  const all = await db.select().from(channels);
+  const versions = new Map(all.map((c) => [c.id, profileVersion(c)]));
+  const existing = await db.select({ channelId: items.channelId, title: items.title }).from(items);
+  const seen = new Set(existing.map((e) => `${e.channelId}::${e.title}`));
+
+  const fresh = SEED_CONTENT.filter(
+    (entry) => versions.has(entry.channelId) && !seen.has(`${entry.channelId}::${entry.title}`),
+  );
+  if (!fresh.length) return;
+
+  const stamp = new Date().toISOString();
+  await db.insert(items).values(
+    fresh.map((entry) => ({
+      id: randomUUID(),
+      channelId: entry.channelId,
+      title: entry.title,
+      hook: entry.hook ?? null,
+      premise: entry.premise ?? null,
+      script: entry.script ?? null,
+      loopLine: entry.loopLine ?? null,
+      estimatedSeconds: entry.estimatedSeconds ?? null,
+      realAnswer: entry.realAnswer ?? null,
+      fakeAnswer: entry.fakeAnswer ?? null,
+      status: "scripted" as const,
+      profileVersion: versions.get(entry.channelId) ?? null,
+      createdAt: stamp,
+      updatedAt: stamp,
+    })),
+  );
 }
 
 /**

@@ -178,7 +178,6 @@ const ScriptSchema = z.object({
   loopLine: z
     .string()
     .describe("The closing line, written to send the viewer back to the opening frame"),
-  shotNotes: z.string().describe("What to film or capture on screen, as markdown bullets"),
   caption: z
     .string()
     .min(1)
@@ -227,6 +226,8 @@ export async function generateScript(opts: {
     item.notes ? `\nNOTES FROM THE HOST: ${item.notes}` : ``,
     ``,
     styleBrief,
+    ``,
+    `Write the script only. No filming tips, no lighting or camera guidance, no editing notes — those are handled separately and are not wanted here. Visual cues that are part of the script itself, like [INTERRUPT: hard cut], stay.`,
     ``,
     `Also write the caption and hashtags. The caption adds something the video does not say out loud — it does not summarise the video.`,
     ``,
@@ -322,4 +323,62 @@ export async function captionForVideo(opts: {
   const parsed = response.parsed_output;
   if (!parsed) throw new GenerationError("Claude returned no parseable caption. Try again.");
   return parsed;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Trivia questions                                                           */
+/* -------------------------------------------------------------------------- */
+
+const QuestionsSchema = z.object({
+  questions: z.array(
+    z.object({
+      question: z.string().describe("The question to ask a stranger. Short and instantly gettable."),
+      realAnswer: z.string().describe("The true answer"),
+      fakeAnswer: z
+        .string()
+        .describe("What to insist on instead — wrong, but said with total confidence"),
+    }),
+  ),
+});
+
+export type GeneratedQuestion = z.infer<typeof QuestionsSchema>["questions"][number];
+
+export async function generateQuestions(opts: {
+  channel: Channel;
+  count: number;
+  existing: string[];
+}): Promise<GeneratedQuestion[]> {
+  const { channel, count, existing } = opts;
+
+  const response = await getClient().beta.messages.parse({
+    model: MODEL,
+    max_tokens: 8000,
+    betas: [FALLBACK_BETA],
+    fallbacks: "default",
+    thinking: { type: "adaptive" },
+    output_config: { effort: "medium", format: zodOutputFormat(QuestionsSchema) },
+    system: [
+      { type: "text", text: channelSystem(channel), cache_control: { type: "ephemeral" } },
+    ],
+    messages: [
+      {
+        role: "user",
+        content: [
+          `Write ${count} questions for stopping strangers in the street.`,
+          ``,
+          `Each needs three things: the question, the true answer, and the wrong answer to insist on.`,
+          ``,
+          `The question must be something almost anyone gets right instantly — capitals, simple counting, basic science, famous paintings. If they have to think, the bit does not work, because the whole joke is correcting someone who is certain.`,
+          ``,
+          `The wrong answer is the craft. It has to be sayable with a straight face, so it needs a reason attached — a technicality, a supposed rule change, a distinction that sounds official. "It's actually six" is weak. "Six — everyone says eight" is better. Best of all is a wrong answer resting on a real-sounding distinction they cannot immediately disprove.`,
+          ``,
+          `Never anything where being wrong would embarrass someone about their own life, their education or where they live. Keep it to facts nobody is judged for.`,
+          existing.length ? `\nAlready have these, do not repeat: ${existing.join(" | ")}` : ``,
+        ].join("\n"),
+      },
+    ],
+  });
+
+  assertNotRefused(response.stop_reason);
+  return response.parsed_output?.questions ?? [];
 }

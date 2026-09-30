@@ -195,7 +195,6 @@ export async function runScriptGeneration(fd: FormData) {
         script: result.script,
         loopLine: result.loopLine,
         estimatedSeconds: Math.round(result.estimatedSeconds),
-        shotNotes: result.shotNotes,
         caption: result.caption,
         hashtags: result.hashtags.join(" "),
         // Only advance the pipeline; never walk a filmed video back to scripted.
@@ -472,7 +471,6 @@ export async function scriptMyIdea(input: {
         script: script.script,
         loopLine: script.loopLine,
         estimatedSeconds: Math.round(script.estimatedSeconds),
-        shotNotes: script.shotNotes,
         caption: script.caption,
         hashtags: script.hashtags.join(" "),
         status: "scripted",

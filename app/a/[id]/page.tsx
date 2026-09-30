@@ -23,13 +23,14 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
 
   const pool = await getPool(id);
   const isSources = channel.mode === "sources";
+  const isQuestions = channel.mode === "questions";
 
   // Anything written under an older version of this channel's rules is stale.
   // Surfacing that here is what makes the refill start on its own, instead of
   // waiting for someone to notice the list is out of date.
   const version = profileVersion(channel);
   const stale = pool.filter((p) => !p.fromUser && p.profileVersion !== version);
-  const scripted = pool.filter((p) => (isSources ? true : p.script));
+  const scripted = pool.filter((p) => (channel.mode === "scripts" ? p.script : true));
   const edits = await db
     .select()
     .from(videos)
@@ -59,7 +60,9 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
             <p className="label mt-1">
               {isSources
                 ? `${pool.length} accounts to pull from`
-                : `${scripted.length} of ${POOL_SIZE} ready to record`}
+                : isQuestions
+                  ? `${pool.length} questions ready`
+                  : `${scripted.length} of ${POOL_SIZE} ready to record`}
             </p>
           </div>
         </div>
@@ -68,7 +71,9 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
       <section>
         <SectionHead
           num="01"
-          title={isSources ? "Accounts to react to" : "Your ten ideas"}
+          title={
+            isSources ? "Accounts to react to" : isQuestions ? "Questions to ask" : "Your ten ideas"
+          }
           action={
             pool.length > 0 ? (
               <form action={replaceAllIdeas}>
@@ -78,12 +83,12 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
             ) : undefined
           }
         />
-        {!isSources && <MyIdeaBox channelId={channel.id} />}
+        {channel.mode === "scripts" && <MyIdeaBox channelId={channel.id} />}
         <PoolFiller
           channelId={channel.id}
           missingIdeas={stale.length > 0 ? POOL_SIZE : Math.max(0, POOL_SIZE - pool.length)}
           staleCount={stale.length}
-          missingScripts={isSources ? 0 : pool.length - scripted.length}
+          missingScripts={channel.mode === "scripts" ? pool.length - scripted.length : 0}
         />
 
         <div className="flex flex-col gap-3">
@@ -94,7 +99,21 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div className="min-w-0 flex-1">
-                  {isSources ? (
+                  {isQuestions ? (
+                    <>
+                      <h3 className="text-base font-semibold leading-snug">{item.title}</h3>
+                      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                        <div className="rounded-sm border border-rulesoft bg-surface2 p-2.5">
+                          <p className="label !text-[var(--good)]">Real answer</p>
+                          <p className="mt-1 text-sm font-medium">{item.realAnswer}</p>
+                        </div>
+                        <div className="rounded-sm border border-rulesoft bg-surface2 p-2.5">
+                          <p className="label !text-[var(--tally)]">Tell them</p>
+                          <p className="mt-1 text-sm font-medium">{item.fakeAnswer}</p>
+                        </div>
+                      </div>
+                    </>
+                  ) : isSources ? (
                     <>
                       {item.sourceUrl ? (
                         <a
@@ -162,13 +181,6 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
                             </div>
                           )}
 
-                          {item.shotNotes && (
-                            <div className="mt-3 border-t border-rulesoft pt-3">
-                              <p className="label">How to shoot it</p>
-                              <div className="prose-script mt-1">{item.shotNotes}</div>
-                            </div>
-                          )}
-
                           {item.caption && (
                             <div className="mt-3 border-t border-rulesoft pt-3">
                               <p className="label">Caption</p>
@@ -193,14 +205,14 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
                     <form action={crossOffIdea}>
                       <input type="hidden" name="id" value={item.id} />
                       <CrossOffButton reason="recorded">
-                        {isSources ? "Used it" : "Recorded it"}
+                        {isSources ? "Used it" : isQuestions ? "Asked it" : "Recorded it"}
                       </CrossOffButton>
                     </form>
                     <form action={crossOffIdea}>
                       <input type="hidden" name="id" value={item.id} />
                       <CrossOffButton reason="rejected">Not for me</CrossOffButton>
                     </form>
-                    {!isSources && (
+                    {channel.mode === "scripts" && (
                       <Link href={`/items/${item.id}`} className="btn">
                         Edit
                       </Link>

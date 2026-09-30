@@ -291,6 +291,7 @@ export const CHANNEL_SEED = [
     ],
     cta: null,
     productNotes: null,
+    mode: "questions" as const,
     styleNotes:
       "The whole format lives in the pause. Ask, let them answer, and then do nothing for a full beat before you correct them — the silence is what makes the correction land and what makes the clip rewatchable. Shoot so their face is the subject, not yours: you can be off-camera entirely. Keep your own delivery low-energy; their reaction supplies all the energy the video needs.",
     scriptStyle: "beats" as const,

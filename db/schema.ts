@@ -25,6 +25,9 @@ export const channels = sqliteTable("channels", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   handle: text("handle"),
+  /** Street Talk: what is actually true, and what to insist on instead. */
+  realAnswer: text("real_answer"),
+  fakeAnswer: text("fake_answer"),
   accent: text("accent").notNull(),
   /** What this channel is for. Drives every generated idea. */
   mission: text("mission").notNull(),
@@ -53,7 +56,7 @@ export const channels = sqliteTable("channels", {
    * "sources" fills it with real accounts to pull material from instead —
    * some channels are bottlenecked on finding material, not on writing.
    */
-  mode: text("mode").$type<"scripts" | "sources">().notNull().default("scripts"),
+  mode: text("mode").$type<"scripts" | "sources" | "questions">().notNull().default("scripts"),
 });
 
 export const items = sqliteTable("items", {
@@ -79,6 +82,9 @@ export const items = sqliteTable("items", {
   assetUrl: text("asset_url"),
   postUrl: text("post_url"),
   handle: text("handle"),
+  /** Street Talk: what is actually true, and what to insist on instead. */
+  realAnswer: text("real_answer"),
+  fakeAnswer: text("fake_answer"),
   sourceUrl: text("source_url"),
   clipId: text("clip_id"),
   notes: text("notes"),

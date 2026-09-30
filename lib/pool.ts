@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { and, asc, desc, eq, inArray, isNull, or } from "drizzle-orm";
 import { db, items } from "@/db";
 import type { Item } from "@/db/schema";
-import { generateIdeas, generateScript } from "./claude";
+import { generateIdeas, generateQuestions, generateScript } from "./claude";
 import { profileVersion } from "./profile-version";
 import { getChannel, getRecentTitles, getTopPerformers } from "./queries";
 import { ready } from "@/db/ready";
@@ -45,6 +45,31 @@ export async function ensurePool(channelId: string, target = POOL_SIZE) {
   const pool = await getPool(channelId);
   const missing = target - pool.length;
   if (missing <= 0) return { added: 0, dropped };
+
+  // A question channel collects prompts to ask strangers, not scripts.
+  if (channel.mode === "questions") {
+    const qs = await generateQuestions({
+      channel,
+      count: missing,
+      existing: pool.map((p) => p.title),
+    });
+    if (!qs.length) return { added: 0, dropped };
+
+    await db.insert(items).values(
+      qs.map((q) => ({
+        id: randomUUID(),
+        channelId,
+        title: q.question,
+        realAnswer: q.realAnswer,
+        fakeAnswer: q.fakeAnswer,
+        status: "scripted" as const,
+        profileVersion: version,
+        createdAt: now(),
+        updatedAt: now(),
+      })),
+    );
+    return { added: qs.length, dropped };
+  }
 
   // A source channel collects accounts to pull material from, not scripts.
   if (channel.mode === "sources") {
@@ -148,7 +173,7 @@ export async function writeNextScripts(channelId: string, batch = SCRIPT_BATCH) 
   const channel = await getChannel(channelId);
   if (!channel) return { written: 0, remaining: 0, error: "Channel not found." };
 
-  if (channel.mode === "sources") return { written: 0, remaining: 0 };
+  if (channel.mode !== "scripts") return { written: 0, remaining: 0 };
 
   const pending = await unscripted(channelId);
   if (!pending.length) return { written: 0, remaining: 0 };
@@ -165,7 +190,6 @@ export async function writeNextScripts(channelId: string, batch = SCRIPT_BATCH) 
           script: script.script,
           loopLine: script.loopLine,
           estimatedSeconds: Math.round(script.estimatedSeconds),
-          shotNotes: script.shotNotes,
           caption: script.caption,
           hashtags: script.hashtags.join(" "),
           status: "scripted",
