@@ -122,25 +122,45 @@ async function refreshUntouchedProfiles(): Promise<void> {
       continue;
     }
 
+    // Structural fields describe how a channel works, not how it is worded, so
+    // they always track the code. A channel switched to a different mode kept
+    // behaving the old way otherwise, because it was gated behind a wording
+    // change that never came.
+    const structural = {
+      name: row.name,
+      mode: row.mode ?? ("scripts" as const),
+      scriptStyle: row.scriptStyle,
+      sortOrder: row.sortOrder,
+      logo: row.logo,
+      newsDriven: row.newsDriven ?? false,
+    };
+
+    const structuralChanged =
+      current.mode !== structural.mode ||
+      current.name !== structural.name ||
+      current.scriptStyle !== structural.scriptStyle ||
+      current.sortOrder !== structural.sortOrder ||
+      current.logo !== structural.logo ||
+      current.newsDriven !== structural.newsDriven;
+
+    if (structuralChanged) {
+      await db.update(channels).set(structural).where(eq(channels.id, row.id));
+    }
+
+    // Wording is only replaced when it is still a default nobody has edited.
     if (!SUPERSEDED_MISSIONS.has(current.mission)) continue;
 
     await db
       .update(channels)
       .set({
-        // Renaming a channel has to reach existing databases too.
-        name: row.name,
         mission: row.mission,
         audience: row.audience,
         voice: row.voice,
         formats: row.formats,
         neverDo: row.neverDo,
-        newsDriven: row.newsDriven ?? false,
         cta: row.cta ?? null,
         productNotes: row.productNotes ?? null,
         styleNotes: row.styleNotes ?? null,
-        scriptStyle: row.scriptStyle,
-        sortOrder: row.sortOrder,
-        logo: row.logo,
       })
       .where(eq(channels.id, row.id));
   }
