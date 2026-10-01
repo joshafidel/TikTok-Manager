@@ -104,6 +104,13 @@ export const items = sqliteTable("items", {
    */
   profileVersion: text("profile_version"),
   archived: integer("archived", { mode: "boolean" }).notNull().default(false),
+  /**
+   * Why it was archived: "rejected" if it was turned down on purpose, "stale"
+   * if it was cleared out because the channel's rules moved on. The difference
+   * matters — a rejection is a decision and is never undone, while a clear-out
+   * is housekeeping.
+   */
+  archivedReason: text("archived_reason").$type<"rejected" | "stale">(),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
 });

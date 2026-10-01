@@ -87,20 +87,29 @@ async function installSeedContent(): Promise<void> {
       channelId: items.channelId,
       title: items.title,
       archived: items.archived,
+      archivedReason: items.archivedReason,
       profileVersion: items.profileVersion,
     })
     .from(items);
   const byKey = new Map(existing.map((e) => [`${e.channelId}::${e.title}`, e]));
 
   // Content shipped with this build was written against today's rules, so a
-  // copy still sitting in the database under an older stamp is brought up to
-  // date rather than left to be cleared out a moment later. An entry that was
-  // crossed off stays crossed off — that was a decision, not staleness.
+  // copy sitting in the database under an older stamp is brought up to date
+  // rather than cleared out a moment later — including one that was already
+  // cleared out, which is housekeeping rather than a decision.
+  //
+  // An entry turned down on purpose stays gone. Rows archived before that
+  // distinction was recorded carry no reason, and the shipped version wins for
+  // those, once.
   for (const entry of SEED_CONTENT) {
     const version = versions.get(entry.channelId);
     const row = byKey.get(`${entry.channelId}::${entry.title}`);
-    if (!version || !row || row.archived || row.profileVersion === version) continue;
-    await db.update(items).set({ profileVersion: version }).where(eq(items.id, row.id));
+    if (!version || !row || row.archivedReason === "rejected") continue;
+    if (!row.archived && row.profileVersion === version) continue;
+    await db
+      .update(items)
+      .set({ archived: false, archivedReason: null, profileVersion: version })
+      .where(eq(items.id, row.id));
   }
 
   const fresh = SEED_CONTENT.filter(

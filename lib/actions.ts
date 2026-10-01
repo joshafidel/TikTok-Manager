@@ -424,7 +424,10 @@ export async function crossOffIdea(fd: FormData): Promise<void> {
       .set({ status: "recorded", recordOn: todayISO(), updatedAt: now() })
       .where(eq(items.id, id));
   } else {
-    await db.update(items).set({ archived: true, updatedAt: now() }).where(eq(items.id, id));
+    await db
+      .update(items)
+      .set({ archived: true, archivedReason: "rejected", updatedAt: now() })
+      .where(eq(items.id, id));
   }
 
   // Draw the replacement idea now; its script is written by the pool filler on

@@ -1,0 +1,1 @@
+ALTER TABLE `items` ADD `archived_reason` text;

@@ -35,7 +35,7 @@ export async function pruneChannel(channelId: string, version: string): Promise<
 
   await db
     .update(items)
-    .set({ archived: true, updatedAt: new Date().toISOString() })
+    .set({ archived: true, archivedReason: "stale", updatedAt: new Date().toISOString() })
     .where(
       inArray(
         items.id,
