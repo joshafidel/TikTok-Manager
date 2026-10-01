@@ -5,6 +5,7 @@ import { db, items } from "@/db";
 import type { Item } from "@/db/schema";
 import { generateIdeas, generateQuestions, generateScript } from "./claude";
 import { profileVersion } from "./profile-version";
+import { pruneChannel } from "./prune";
 import { getChannel, getRecentTitles, getTopPerformers } from "./queries";
 import { ready } from "@/db/ready";
 
@@ -16,9 +17,22 @@ export const SCRIPT_BATCH = 3;
 
 const now = () => new Date().toISOString();
 
-/** The live pool: ideas waiting to be recorded, newest last so it reads as a queue. */
+/**
+ * The live pool: ideas waiting to be recorded, newest last so it reads as a queue.
+ *
+ * Clears out anything written under older rules first, so a stale entry is
+ * never read and therefore never shown — not even for the one page load before
+ * a replacement arrives.
+ */
 export async function getPool(channelId: string): Promise<Item[]> {
   await ready();
+  const channel = await getChannel(channelId);
+  if (channel) await pruneChannel(channelId, profileVersion(channel));
+  return readPool(channelId);
+}
+
+/** The same read without the clear-out, for callers that have just done one. */
+async function readPool(channelId: string): Promise<Item[]> {
   return db
     .select()
     .from(items)
@@ -40,9 +54,9 @@ export async function ensurePool(channelId: string, target = POOL_SIZE) {
   if (!channel) return { added: 0, error: "Channel not found." };
 
   const version = profileVersion(channel);
-  const dropped = await dropStale(channelId, version);
+  const dropped = await pruneChannel(channelId, version);
 
-  const pool = await getPool(channelId);
+  const pool = await readPool(channelId);
   const missing = target - pool.length;
   if (missing <= 0) return { added: 0, dropped };
 
@@ -208,27 +222,4 @@ export async function writeNextScripts(channelId: string, batch = SCRIPT_BATCH) 
     // Surface one failure rather than looping forever on a script that won't write.
     error: failure ? String(failure.reason?.message ?? failure.reason) : undefined,
   };
-}
-
-/**
- * Removes entries written under a different profile.
- *
- * This is what closes the loop: changing a channel's rules used to leave the
- * old output sitting on screen indefinitely, because the top-up only ran when a
- * channel was short and it never was. Anything stamped with a superseded
- * profile is cleared here so the refill happens on its own.
- *
- * Ideas the user typed in themselves are kept — those are theirs, not ours.
- */
-async function dropStale(channelId: string, version: string): Promise<number> {
-  const live = await getPool(channelId);
-  const stale = live.filter((i) => !i.fromUser && i.profileVersion !== version);
-  if (!stale.length) return 0;
-
-  await db
-    .update(items)
-    .set({ archived: true, updatedAt: now() })
-    .where(inArray(items.id, stale.map((i) => i.id)));
-
-  return stale.length;
 }

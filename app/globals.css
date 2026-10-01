@@ -68,6 +68,11 @@ body {
            tracking-[0.08em] text-ink2 transition-colors hover:bg-surface2
            hover:text-ink disabled:cursor-not-allowed disabled:opacity-50;
   }
+  /* Row-sized button, for the dense question table where a full-height
+     button would push the rows apart. */
+  .btn-xs {
+    @apply px-1.5 py-0.5 text-[0.6rem] tracking-[0.06em];
+  }
   .btn-primary {
     @apply border-transparent bg-[var(--tally)] text-white hover:bg-[var(--tally)] hover:opacity-90 hover:text-white;
   }

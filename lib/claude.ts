@@ -138,6 +138,8 @@ export async function generateIdeas(opts: {
           newsDigest,
           ``,
           `Every idea must point at something on this list, named exactly. Do not invent a study, a tool, a company, a number or an event. Do not write a hypothetical scenario — "imagine if", "let's say a company", "picture this" are all failures here. If an item on the list is too thin to carry a video, skip it rather than embellishing it.`,
+          ``,
+          `Start every title with the date that story broke, short form, then an em dash: "Sep 29 — Anthropic's leaked prospectus". Take the date from the item itself. If the item does not say when it was reported, leave it out of the batch rather than guessing a date.`,
         ].join("\n")
       : ``,
   ].join("\n");
@@ -332,7 +334,11 @@ export async function captionForVideo(opts: {
 const QuestionsSchema = z.object({
   questions: z.array(
     z.object({
-      question: z.string().describe("The question to ask a stranger. Short and instantly gettable."),
+      question: z
+        .string()
+        .describe(
+          "The question as it is said out loud to a stranger, ending in a question mark. Short and instantly gettable.",
+        ),
       realAnswer: z.string().describe("The true answer"),
       fakeAnswer: z
         .string()
@@ -368,6 +374,8 @@ export async function generateQuestions(opts: {
           ``,
           `Each needs three things: the question, the true answer, and the wrong answer to insist on.`,
           ``,
+          `Write every one as an actual question, worded exactly as it is said out loud, ending in a question mark. Not a topic, not a statement, not a note to self. "What is the capital of Australia?" — not "Australia's capital" and not "Ask about Australia".`,
+          ``,
           `The question must be something almost anyone gets right instantly — capitals, simple counting, basic science, famous paintings. If they have to think, the bit does not work, because the whole joke is correcting someone who is certain.`,
           ``,
           `The wrong answer is the craft. It has to be sayable with a straight face, so it needs a reason attached — a technicality, a supposed rule change, a distinction that sounds official. "It's actually six" is weak. "Six — everyone says eight" is better. Best of all is a wrong answer resting on a real-sounding distinction they cannot immediately disprove.`,
@@ -380,5 +388,9 @@ export async function generateQuestions(opts: {
   });
 
   assertNotRefused(response.stop_reason);
-  return response.parsed_output?.questions ?? [];
+
+  // Enforced here as well as asked for in the prompt: anything that is not
+  // phrased as a question is not usable on the street, so it is dropped rather
+  // than shown. The pool simply tops up again on the next pass.
+  return (response.parsed_output?.questions ?? []).filter((q) => q.question.trim().endsWith("?"));
 }

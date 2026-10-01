@@ -5,6 +5,7 @@ import { CHANNEL_SEED, SUPERSEDED_MISSIONS } from "./channels";
 import { SEED_CONTENT } from "./seed-content";
 import { items } from "./schema";
 import { profileVersion } from "@/lib/profile-version";
+import { pruneAllChannels } from "@/lib/prune";
 import { randomUUID } from "node:crypto";
 
 /**
@@ -59,6 +60,12 @@ async function bootstrap(): Promise<void> {
   // Runs on both paths. Returning early after seeding channels meant a fresh
   // database never received any of this content.
   await installSeedContent();
+
+  // Clear out everything written under rules that have since changed, for every
+  // channel, without waiting for anyone to open the page. Runs after the
+  // profile refresh above so it compares against the corrected profiles, and
+  // after seeding so today's content is stamped current and survives.
+  await pruneAllChannels();
 }
 
 /**

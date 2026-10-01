@@ -176,6 +176,7 @@ const tallyFormats: Format[] = [
 ];
 
 export const SUPERSEDED_MISSIONS = new Set<string>([
+  "Volume and reach. Dramatic, funny reactions to the most absurd and grotesque corners of Instagram Reels — the food crimes, the unhinged thirst-trap monologues, the things that should not have been filmed. Fastest to grow and cheapest to make, and the channel that feeds followers to the other three.",
   "Break real AI news. Every video starts from an actual headline from the last few days — what happened, why it matters, and what the viewer should do about it. Also covers tools and sites worth opening today. Credibility comes from being accurate, specific and fast about things that genuinely exist. This is the channel brands in the AI space pay to be next to, and the top of the funnel for Tally.",
   "Volume and reach. Dramatic, funny reactions to absurdly gross Instagram reels. This is the channel that grows fastest and costs the least to make.",
   "Market Tally. Every video introduces the app to someone who has never heard of it and shows them why it is worth opening — by naming a frustration they have actually had and then showing the app solving it on screen. Judged on installs and polls created, not views: a 4k-view video that converts beats a 90k-view video that does not.",
@@ -192,7 +193,7 @@ export const CHANNEL_SEED = [
     handle: null,
     accent: "#2A62A8",
     mission:
-      "Break real AI news. Every video starts from an actual headline from the last few days — what happened, why it matters, and what the viewer should do about it. Also covers tools and sites worth opening today. Credibility comes from being accurate, specific and fast about things that genuinely exist. This is the channel brands in the AI space pay to be next to, and the top of the funnel for Tally.",
+      "Break real AI news. Every video starts from an actual headline from the last few days, and every title opens with the date that story broke, so the age of the news is never in doubt. What happened, why it matters, and what the viewer should do about it. Credibility comes from being accurate, specific and fast about things that genuinely exist. This is the channel brands in the AI space pay to be next to, and the top of the funnel for Tally.",
     audience:
       "Curious non-experts and early-career technical people who want to stay current without reading twenty newsletters. They feel behind, they are tired of hype and doom, and they can tell immediately when someone is describing something they have not actually used.",
     voice:
@@ -221,6 +222,9 @@ export const CHANNEL_SEED = [
       "Hype-free and genuinely useful. Explains AI so a normal person leaves with something they can do, not a feeling that the future is scary or amazing. No breathlessness, no doom. Take from him: the refusal to hype, and the rule that a viewer should be able to act on the video within a day.",
       "",
       "The combination: Kallaway's structure, Dylan Page's energy, Will Francis's honesty. Fast and warm, built on curiosity loops, and never overselling what actually happened.",
+      "",
+      "TITLES CARRY THE DATE.",
+      "Every title starts with the date the story broke, written short — \"Sep 29 — Anthropic's leaked prospectus\". Not the date you are recording, the date it was reported. A story you cannot date is a story you are not sure happened, so it does not get written.",
     ].join("\n"),
     scriptStyle: "full" as const,
     cadencePerWeek: 4,
@@ -236,7 +240,7 @@ export const CHANNEL_SEED = [
     handle: null,
     accent: "#71469E",
     mission:
-      "Volume and reach. Dramatic, funny reactions to the most absurd and grotesque corners of Instagram Reels — the food crimes, the unhinged thirst-trap monologues, the things that should not have been filmed. Fastest to grow and cheapest to make, and the channel that feeds followers to the other three.",
+      "Volume and reach. Dramatic, funny reactions to the most shocking people on Instagram — OnlyFans creators whose entire promotion strategy is doing something indefensible in public, stunt announcements, the house collectives, the earnings brags. Reaction content about people, not about food. Fastest to grow and cheapest to make, and the channel that feeds followers to the other three.",
     audience:
       "People who watch reaction content late at night and want a host whose reaction is bigger and funnier than their own. They are here for the delivery, not the clip.",
     voice:
@@ -252,8 +256,9 @@ export const CHANNEL_SEED = [
     cta: null,
     styleNotes: [
       "WHERE THE MATERIAL COMES FROM",
-      "The clip queue is the bottleneck, not the writing. Stock it from the corners that reliably produce: unhinged thirst-trap monologues where someone says something genuinely deranged with total confidence, food crimes and impossible-texture cooking, home renovation and DIY that defies physics, mukbang gone wrong, and the pages that exist purely to bait a reaction.",
-      "Save them to a collection as you find them, and log the link plus a one-line premise here the same day. Never go looking on a record day.",
+      "One category only: the shock creators. OnlyFans models whose promotion is the stunt — the record attempts, the public nuisance clips, the numbers they announce — plus the creator-house collectives, the earnings brags, and the podcast appearances where someone says something genuinely deranged with total confidence.",
+      "Not food. No cursed cooking, no mukbang, no kitchen accounts, no renovation or DIY, no aggregator pages reposting other people's clips. Those were tried and they are off the channel.",
+      "Save clips to a collection as you find them, and log the link plus a one-line premise here the same day. Never go looking on a record day.",
       "",
       "ONE CATEGORY TO LEAVE ALONE — real fights and real violence.",
       "TikTok explicitly prohibits real-world physical violence and fighting as shocking content, and content that breaks the guidelines is disqualified from earning and from brand deals. Since the point of these accounts is money, a fight clip costs more than it returns: the video is suppressed, the post earns nothing, and repeated strikes take the account down. Gross, absurd, and unhinged all monetise. Violent does not.",
@@ -293,7 +298,7 @@ export const CHANNEL_SEED = [
     productNotes: null,
     mode: "questions" as const,
     styleNotes:
-      "The whole format lives in the pause. Ask, let them answer, and then do nothing for a full beat before you correct them — the silence is what makes the correction land and what makes the clip rewatchable. Shoot so their face is the subject, not yours: you can be off-camera entirely. Keep your own delivery low-energy; their reaction supplies all the energy the video needs.",
+      "Every entry is written as a question, out loud, exactly as it is asked on the street — it ends in a question mark and it is short enough to say in one breath. Never a topic, never a statement, never an instruction to yourself. \"How many sides does a stop sign have?\" is the entry; \"stop sign sides\" is not.\n\nThe whole format lives in the pause. Ask, let them answer, and then do nothing for a full beat before you correct them — the silence is what makes the correction land and what makes the clip rewatchable. Shoot so their face is the subject, not yours: you can be off-camera entirely. Keep your own delivery low-energy; their reaction supplies all the energy the video needs.",
     scriptStyle: "beats" as const,
     cadencePerWeek: 5,
     targetDepth: 8,

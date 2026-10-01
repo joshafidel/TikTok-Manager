@@ -104,15 +104,18 @@ export function PoolFiller({
 export function CrossOffButton({
   reason,
   children,
+  className = "",
 }: {
   reason: "rejected" | "recorded";
   children: React.ReactNode;
+  /** For the dense question rows, which use the smaller button size. */
+  className?: string;
 }) {
   const { pending } = useFormStatus();
   return (
     <>
       <input type="hidden" name="reason" value={reason} />
-      <button type="submit" className="btn" disabled={pending}>
+      <button type="submit" className={`btn ${className}`} disabled={pending}>
         {pending ? "Replacing…" : children}
       </button>
     </>

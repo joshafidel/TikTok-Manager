@@ -8,7 +8,12 @@ import { getPool, POOL_SIZE } from "@/lib/pool";
 import { profileVersion } from "@/lib/profile-version";
 import { crossOffIdea, replaceAllIdeas } from "@/lib/actions";
 import { RECORDING_TIPS } from "@/lib/playbook";
-import { CrossOffButton, MyIdeaBox, PoolFiller, ReplaceAllButton } from "@/components/pool-client";
+import {
+  CrossOffButton,
+  MyIdeaBox,
+  PoolFiller,
+  ReplaceAllButton,
+} from "@/components/pool-client";
 import { VideoUploader } from "@/components/video-client";
 import { SectionHead } from "@/components/ui";
 
@@ -16,7 +21,11 @@ export const dynamic = "force-dynamic";
 // Generating ideas and scripts runs well past a default function timeout.
 export const maxDuration = 300;
 
-export default async function AccountPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function AccountPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const channel = await getChannel(id);
   if (!channel) notFound();
@@ -30,7 +39,9 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
   // waiting for someone to notice the list is out of date.
   const version = profileVersion(channel);
   const stale = pool.filter((p) => !p.fromUser && p.profileVersion !== version);
-  const scripted = pool.filter((p) => (channel.mode === "scripts" ? p.script : true));
+  const scripted = pool.filter((p) =>
+    channel.mode === "scripts" ? p.script : true,
+  );
   const edits = await db
     .select()
     .from(videos)
@@ -56,7 +67,9 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
             />
           )}
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">{channel.name}</h1>
+            <h1 className="text-2xl font-bold tracking-tight">
+              {channel.name}
+            </h1>
             <p className="label mt-1">
               {isSources
                 ? `${pool.length} accounts to pull from`
@@ -72,7 +85,11 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
         <SectionHead
           num="01"
           title={
-            isSources ? "Accounts to react to" : isQuestions ? "Questions to ask" : "Your ten ideas"
+            isSources
+              ? "Accounts to react to"
+              : isQuestions
+                ? "Questions to ask"
+                : "Your ten ideas"
           }
           action={
             pool.length > 0 ? (
@@ -86,143 +103,202 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
         {channel.mode === "scripts" && <MyIdeaBox channelId={channel.id} />}
         <PoolFiller
           channelId={channel.id}
-          missingIdeas={stale.length > 0 ? POOL_SIZE : Math.max(0, POOL_SIZE - pool.length)}
+          missingIdeas={
+            stale.length > 0 ? POOL_SIZE : Math.max(0, POOL_SIZE - pool.length)
+          }
           staleCount={stale.length}
-          missingScripts={channel.mode === "scripts" ? pool.length - scripted.length : 0}
+          missingScripts={
+            channel.mode === "scripts" ? pool.length - scripted.length : 0
+          }
         />
 
-        <div className="flex flex-col gap-3">
-          {pool.map((item, i) => (
-            <article key={item.id} className="card p-4">
-              <div className="flex items-start gap-3">
-                <span className="label w-6 flex-none pt-1 tabular-nums">
+        {/*
+          Questions are read as a set, not one at a time, so they sit in a
+          single table with the rows against each other and the two buttons
+          out at the end of each row. Everything else stays a card, because a
+          script needs the room.
+        */}
+        {isQuestions ? (
+          <div className="card divide-y divide-rulesoft overflow-hidden">
+            {pool.map((item, i) => (
+              <div
+                key={item.id}
+                className="flex items-center gap-2.5 px-3 py-2"
+              >
+                <span className="label w-5 flex-none tabular-nums">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div className="min-w-0 flex-1">
-                  {isQuestions ? (
-                    <>
-                      <h3 className="text-base font-semibold leading-snug">{item.title}</h3>
-                      <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                        <div className="rounded-sm border border-rulesoft bg-surface2 p-2.5">
-                          <p className="label !text-[var(--good)]">Real answer</p>
-                          <p className="mt-1 text-sm font-medium">{item.realAnswer}</p>
-                        </div>
-                        <div className="rounded-sm border border-rulesoft bg-surface2 p-2.5">
-                          <p className="label !text-[var(--tally)]">Tell them</p>
-                          <p className="mt-1 text-sm font-medium">{item.fakeAnswer}</p>
-                        </div>
-                      </div>
-                    </>
-                  ) : isSources ? (
-                    <>
-                      {item.sourceUrl ? (
-                        <a
-                          href={item.sourceUrl}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                          className="text-base font-semibold leading-snug underline decoration-1 underline-offset-2"
-                        >
-                          {item.handle ?? item.title}
-                        </a>
-                      ) : (
-                        <h3 className="text-base font-semibold leading-snug">
-                          {item.handle ?? item.title}
-                        </h3>
-                      )}
-                      {item.premise && (
-                        <p className="mt-2 text-sm leading-relaxed text-ink2">{item.premise}</p>
-                      )}
-                      {item.notes && (
-                        <p className="mt-2 border-t border-rulesoft pt-2 font-mono text-[0.62rem] leading-relaxed text-ink3">
-                          {item.notes}
-                        </p>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <h3 className="text-base font-semibold leading-snug">{item.title}</h3>
-                      {item.fromUser && <span className="label mt-1 block">Your idea</span>}
-                      {stale.some((x) => x.id === item.id) && (
-                        <span className="label mt-1 block !text-[var(--tally)]">
-                          Written under older instructions — being replaced
-                        </span>
-                      )}
-
-                      {item.hook && (
-                        <p className="mt-2 border-l-2 border-[var(--tally)] pl-3 text-[0.95rem] font-medium italic leading-snug">
-                          &ldquo;{item.hook}&rdquo;
-                        </p>
-                      )}
-
-                      {item.premise && (
-                        <p className="mt-2 text-sm leading-relaxed text-ink2">{item.premise}</p>
-                      )}
-
-                      {!item.script && (
-                        <p className="mt-2 font-mono text-[0.68rem] text-ink3">
-                          Writing the script…
-                        </p>
-                      )}
-
-                      {item.script && (
-                        <details className="mt-3 border-t border-rulesoft pt-3">
-                          <summary className="label cursor-pointer hover:text-ink">
-                            Read the script
-                            {item.estimatedSeconds ? ` · ~${item.estimatedSeconds}s` : ""}
-                          </summary>
-                          <div className="prose-script mt-3">{item.script}</div>
-
-                          {item.loopLine && (
-                            <div className="mt-3 border-t border-rulesoft pt-3">
-                              <p className="label">Closing line — sends them back to the start</p>
-                              <p className="mt-1 text-sm italic text-ink2">
-                                &ldquo;{item.loopLine}&rdquo;
-                              </p>
-                            </div>
-                          )}
-
-                          {item.caption && (
-                            <div className="mt-3 border-t border-rulesoft pt-3">
-                              <p className="label">Caption</p>
-                              <p className="mt-1 text-sm text-ink2">{item.caption}</p>
-                              {item.hashtags && (
-                                <p className="mt-1 font-mono text-[0.66rem] text-ink3">
-                                  {item.hashtags
-                                    .split(/\s+/)
-                                    .filter(Boolean)
-                                    .map((h) => (h.startsWith("#") ? h : `#${h}`))
-                                    .join(" ")}
-                                </p>
-                              )}
-                            </div>
-                          )}
-                        </details>
-                      )}
-                    </>
-                  )}
-
-                  <div className="mt-3 flex flex-wrap gap-2 border-t border-rulesoft pt-3">
-                    <form action={crossOffIdea}>
-                      <input type="hidden" name="id" value={item.id} />
-                      <CrossOffButton reason="recorded">
-                        {isSources ? "Used it" : isQuestions ? "Asked it" : "Recorded it"}
-                      </CrossOffButton>
-                    </form>
-                    <form action={crossOffIdea}>
-                      <input type="hidden" name="id" value={item.id} />
-                      <CrossOffButton reason="rejected">Not for me</CrossOffButton>
-                    </form>
-                    {channel.mode === "scripts" && (
-                      <Link href={`/items/${item.id}`} className="btn">
-                        Edit
-                      </Link>
-                    )}
-                  </div>
+                  <p className="text-sm font-semibold leading-snug">
+                    {item.title}
+                  </p>
+                  <p className="mt-0.5 font-mono text-[0.64rem] leading-relaxed">
+                    <span className="text-[var(--good)]">
+                      Real: {item.realAnswer}
+                    </span>
+                    <span className="text-ink3"> · </span>
+                    <span className="text-[var(--tally)]">
+                      Say: {item.fakeAnswer}
+                    </span>
+                  </p>
+                </div>
+                <div className="flex flex-none flex-col gap-1 sm:flex-row sm:gap-1.5">
+                  <form action={crossOffIdea}>
+                    <input type="hidden" name="id" value={item.id} />
+                    <CrossOffButton reason="recorded" className="btn-xs">
+                      Asked it
+                    </CrossOffButton>
+                  </form>
+                  <form action={crossOffIdea}>
+                    <input type="hidden" name="id" value={item.id} />
+                    <CrossOffButton reason="rejected" className="btn-xs">
+                      Not for me
+                    </CrossOffButton>
+                  </form>
                 </div>
               </div>
-            </article>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {pool.map((item, i) => (
+              <article key={item.id} className="card p-4">
+                <div className="flex items-start gap-3">
+                  <span className="label w-6 flex-none pt-1 tabular-nums">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    {isSources ? (
+                      <>
+                        {item.sourceUrl ? (
+                          <a
+                            href={item.sourceUrl}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            className="text-base font-semibold leading-snug underline decoration-1 underline-offset-2"
+                          >
+                            {item.handle ?? item.title}
+                          </a>
+                        ) : (
+                          <h3 className="text-base font-semibold leading-snug">
+                            {item.handle ?? item.title}
+                          </h3>
+                        )}
+                        {item.premise && (
+                          <p className="mt-2 text-sm leading-relaxed text-ink2">
+                            {item.premise}
+                          </p>
+                        )}
+                        {item.notes && (
+                          <p className="mt-2 border-t border-rulesoft pt-2 font-mono text-[0.62rem] leading-relaxed text-ink3">
+                            {item.notes}
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <h3 className="text-base font-semibold leading-snug">
+                          {item.title}
+                        </h3>
+                        {item.fromUser && (
+                          <span className="label mt-1 block">Your idea</span>
+                        )}
+                        {stale.some((x) => x.id === item.id) && (
+                          <span className="label mt-1 block !text-[var(--tally)]">
+                            Written under older instructions — being replaced
+                          </span>
+                        )}
+
+                        {item.hook && (
+                          <p className="mt-2 border-l-2 border-[var(--tally)] pl-3 text-[0.95rem] font-medium italic leading-snug">
+                            &ldquo;{item.hook}&rdquo;
+                          </p>
+                        )}
+
+                        {item.premise && (
+                          <p className="mt-2 text-sm leading-relaxed text-ink2">
+                            {item.premise}
+                          </p>
+                        )}
+
+                        {!item.script && (
+                          <p className="mt-2 font-mono text-[0.68rem] text-ink3">
+                            Writing the script…
+                          </p>
+                        )}
+
+                        {item.script && (
+                          <details className="mt-3 border-t border-rulesoft pt-3">
+                            <summary className="label cursor-pointer hover:text-ink">
+                              Read the script
+                              {item.estimatedSeconds
+                                ? ` · ~${item.estimatedSeconds}s`
+                                : ""}
+                            </summary>
+                            <div className="prose-script mt-3">
+                              {item.script}
+                            </div>
+
+                            {item.loopLine && (
+                              <div className="mt-3 border-t border-rulesoft pt-3">
+                                <p className="label">
+                                  Closing line — sends them back to the start
+                                </p>
+                                <p className="mt-1 text-sm italic text-ink2">
+                                  &ldquo;{item.loopLine}&rdquo;
+                                </p>
+                              </div>
+                            )}
+
+                            {item.caption && (
+                              <div className="mt-3 border-t border-rulesoft pt-3">
+                                <p className="label">Caption</p>
+                                <p className="mt-1 text-sm text-ink2">
+                                  {item.caption}
+                                </p>
+                                {item.hashtags && (
+                                  <p className="mt-1 font-mono text-[0.66rem] text-ink3">
+                                    {item.hashtags
+                                      .split(/\s+/)
+                                      .filter(Boolean)
+                                      .map((h) =>
+                                        h.startsWith("#") ? h : `#${h}`,
+                                      )
+                                      .join(" ")}
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                          </details>
+                        )}
+                      </>
+                    )}
+
+                    <div className="mt-3 flex flex-wrap gap-2 border-t border-rulesoft pt-3">
+                      <form action={crossOffIdea}>
+                        <input type="hidden" name="id" value={item.id} />
+                        <CrossOffButton reason="recorded">
+                          {isSources ? "Used it" : "Recorded it"}
+                        </CrossOffButton>
+                      </form>
+                      <form action={crossOffIdea}>
+                        <input type="hidden" name="id" value={item.id} />
+                        <CrossOffButton reason="rejected">
+                          Not for me
+                        </CrossOffButton>
+                      </form>
+                      {channel.mode === "scripts" && (
+                        <Link href={`/items/${item.id}`} className="btn">
+                          Edit
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
 
         {pool.length === 0 && (
           <p className="px-3 py-6 text-center text-sm text-ink3">
@@ -243,10 +319,13 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
                 className="flex flex-wrap items-center gap-3 border-b border-rulesoft px-3 py-2.5 last:border-b-0"
               >
                 <span className="label w-20 flex-none">{v.status}</span>
-                <span className="min-w-0 flex-1 truncate text-sm">{v.filename}</span>
+                <span className="min-w-0 flex-1 truncate text-sm">
+                  {v.filename}
+                </span>
                 {v.plan && (
                   <span className="font-mono text-[0.62rem] tabular-nums text-ink3">
-                    {v.plan.sourceDuration.toFixed(1)}s → {v.plan.keptDuration.toFixed(1)}s
+                    {v.plan.sourceDuration.toFixed(1)}s →{" "}
+                    {v.plan.keptDuration.toFixed(1)}s
                   </span>
                 )}
                 {v.renderUrl && (
@@ -271,7 +350,9 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
           {RECORDING_TIPS.map((tip) => (
             <div key={tip.title} className="card p-4">
               <h3 className="text-sm font-semibold">{tip.title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-ink2">{tip.body}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-ink2">
+                {tip.body}
+              </p>
             </div>
           ))}
         </div>
