@@ -62,7 +62,8 @@ recording auto-edits it and writes the caption.
 - Run `npm run typecheck`, `npm run build` and `npm test` before pushing.
 - Changing `db/schema.ts` means running `npm run db:generate`, which rewrites
   both the migration and `db/bootstrap.ts`.
-- Correcting a shipped channel profile means adding the old mission to
-  `SUPERSEDED_MISSIONS` in `db/channels.ts`, or the fix never reaches the live
-  database.
+- `db/channels.ts` owns the live channel profiles. Correcting one there is
+  enough: every deploy writes them over the database, which also clears out
+  every idea written under the old rules. A channel edited by hand on the
+  Channels screen sets `userEdited` and is left alone from then on.
 - Never commit secrets. Keys are read from the environment.

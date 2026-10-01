@@ -307,6 +307,8 @@ export async function updateChannel(fd: FormData) {
       cadencePerWeek: num(fd, "cadencePerWeek") ?? undefined,
       targetDepth: num(fd, "targetDepth") ?? undefined,
       recordDays,
+      // From here on this profile is the user's. Deploys stop overwriting it.
+      userEdited: true,
     })
     .where(eq(channels.id, id));
   refreshAll();

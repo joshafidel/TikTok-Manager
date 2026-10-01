@@ -57,6 +57,13 @@ export const channels = sqliteTable("channels", {
    * some channels are bottlenecked on finding material, not on writing.
    */
   mode: text("mode").$type<"scripts" | "sources" | "questions">().notNull().default("scripts"),
+  /**
+   * Set the first time someone edits this channel on the Channels screen.
+   * Until then the profile belongs to the code, and every deploy replaces it —
+   * which is what makes a correction written in conversation actually reach the
+   * live app. After a hand edit, the code stops overwriting it.
+   */
+  userEdited: integer("user_edited", { mode: "boolean" }).notNull().default(false),
 });
 
 export const items = sqliteTable("items", {

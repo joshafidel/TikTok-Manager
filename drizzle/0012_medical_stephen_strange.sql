@@ -1,0 +1,1 @@
+ALTER TABLE `channels` ADD `user_edited` integer DEFAULT false NOT NULL;

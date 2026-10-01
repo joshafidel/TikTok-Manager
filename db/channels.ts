@@ -175,16 +175,6 @@ const tallyFormats: Format[] = [
   },
 ];
 
-export const SUPERSEDED_MISSIONS = new Set<string>([
-  "Volume and reach. Dramatic, funny reactions to the most absurd and grotesque corners of Instagram Reels — the food crimes, the unhinged thirst-trap monologues, the things that should not have been filmed. Fastest to grow and cheapest to make, and the channel that feeds followers to the other three.",
-  "Break real AI news. Every video starts from an actual headline from the last few days — what happened, why it matters, and what the viewer should do about it. Also covers tools and sites worth opening today. Credibility comes from being accurate, specific and fast about things that genuinely exist. This is the channel brands in the AI space pay to be next to, and the top of the funnel for Tally.",
-  "Volume and reach. Dramatic, funny reactions to absurdly gross Instagram reels. This is the channel that grows fastest and costs the least to make.",
-  "Market Tally. Every video introduces the app to someone who has never heard of it and shows them why it is worth opening — by naming a frustration they have actually had and then showing the app solving it on screen. Judged on installs and polls created, not views: a 4k-view video that converts beats a 90k-view video that does not.",
-  "Keep people current on AI. Real news, real tools, real applications — what actually happened, what it means, and what is worth opening today. Credibility comes from being accurate and specific about things that genuinely exist, faster than the people around them. This is the channel brands in the AI space pay to be next to, and the top of the funnel for Tally.",
-  "Establish real credibility on AI by being consistently more precise than everyone else in the feed. This channel is the top of the funnel for Tally — a viewer who trusts the explanations is a viewer who will try the app.",
-  "Drive installs of Tally, a civic polling app. Judged on installs and poll creations, not views. A 4k-view video that converts beats a 90k-view video that does not.",
-]);
-
 export const CHANNEL_SEED = [
   {
     id: "ai",

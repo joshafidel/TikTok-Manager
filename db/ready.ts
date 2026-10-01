@@ -1,7 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import { db, channels } from "./index";
 import { BOOTSTRAP_DDL } from "./bootstrap";
-import { CHANNEL_SEED, SUPERSEDED_MISSIONS } from "./channels";
+import { CHANNEL_SEED } from "./channels";
 import { SEED_CONTENT } from "./seed-content";
 import { items } from "./schema";
 import { profileVersion } from "@/lib/profile-version";
@@ -81,11 +81,30 @@ async function installSeedContent(): Promise<void> {
 
   const all = await db.select().from(channels);
   const versions = new Map(all.map((c) => [c.id, profileVersion(c)]));
-  const existing = await db.select({ channelId: items.channelId, title: items.title }).from(items);
-  const seen = new Set(existing.map((e) => `${e.channelId}::${e.title}`));
+  const existing = await db
+    .select({
+      id: items.id,
+      channelId: items.channelId,
+      title: items.title,
+      archived: items.archived,
+      profileVersion: items.profileVersion,
+    })
+    .from(items);
+  const byKey = new Map(existing.map((e) => [`${e.channelId}::${e.title}`, e]));
+
+  // Content shipped with this build was written against today's rules, so a
+  // copy still sitting in the database under an older stamp is brought up to
+  // date rather than left to be cleared out a moment later. An entry that was
+  // crossed off stays crossed off — that was a decision, not staleness.
+  for (const entry of SEED_CONTENT) {
+    const version = versions.get(entry.channelId);
+    const row = byKey.get(`${entry.channelId}::${entry.title}`);
+    if (!version || !row || row.archived || row.profileVersion === version) continue;
+    await db.update(items).set({ profileVersion: version }).where(eq(items.id, row.id));
+  }
 
   const fresh = SEED_CONTENT.filter(
-    (entry) => versions.has(entry.channelId) && !seen.has(`${entry.channelId}::${entry.title}`),
+    (entry) => versions.has(entry.channelId) && !byKey.has(`${entry.channelId}::${entry.title}`),
   );
   if (!fresh.length) return;
 
@@ -114,10 +133,17 @@ async function installSeedContent(): Promise<void> {
 }
 
 /**
- * Replaces profiles that still carry a superseded default. Seeding alone only
- * ever runs against an empty table, so without this a corrected profile would
- * never reach a database that already exists. Anything the user has edited is
- * left exactly as they wrote it.
+ * Makes the channel profiles in the database match the ones in the code.
+ *
+ * The profiles are the product, and they are corrected in conversation — so
+ * the code has to be the source of truth for them, or a correction never
+ * arrives. Previously only the mission was replaced, and only when the old one
+ * had been explicitly listed as retired: a change to any other part of a
+ * profile simply never reached a database that already existed, which is why
+ * entries written under old rules kept surviving.
+ *
+ * The one exception is a channel someone has edited by hand on the Channels
+ * screen. That sets a flag, and from then on the code leaves it alone.
  */
 async function refreshUntouchedProfiles(): Promise<void> {
   const existing = await db.select().from(channels);
@@ -132,37 +158,12 @@ async function refreshUntouchedProfiles(): Promise<void> {
       continue;
     }
 
-    // Structural fields describe how a channel works, not how it is worded, so
-    // they always track the code. A channel switched to a different mode kept
-    // behaving the old way otherwise, because it was gated behind a wording
-    // change that never came.
-    const structural = {
-      name: row.name,
-      mode: row.mode ?? ("scripts" as const),
-      scriptStyle: row.scriptStyle,
-      sortOrder: row.sortOrder,
-      logo: row.logo,
-      newsDriven: row.newsDriven ?? false,
-    };
-
-    const structuralChanged =
-      current.mode !== structural.mode ||
-      current.name !== structural.name ||
-      current.scriptStyle !== structural.scriptStyle ||
-      current.sortOrder !== structural.sortOrder ||
-      current.logo !== structural.logo ||
-      current.newsDriven !== structural.newsDriven;
-
-    if (structuralChanged) {
-      await db.update(channels).set(structural).where(eq(channels.id, row.id));
-    }
-
-    // Wording is only replaced when it is still a default nobody has edited.
-    if (!SUPERSEDED_MISSIONS.has(current.mission)) continue;
+    if (current.userEdited) continue;
 
     await db
       .update(channels)
       .set({
+        name: row.name,
         mission: row.mission,
         audience: row.audience,
         voice: row.voice,
@@ -171,6 +172,14 @@ async function refreshUntouchedProfiles(): Promise<void> {
         cta: row.cta ?? null,
         productNotes: row.productNotes ?? null,
         styleNotes: row.styleNotes ?? null,
+        mode: row.mode ?? ("scripts" as const),
+        scriptStyle: row.scriptStyle,
+        cadencePerWeek: row.cadencePerWeek,
+        targetDepth: row.targetDepth,
+        recordDays: row.recordDays,
+        sortOrder: row.sortOrder,
+        logo: row.logo,
+        newsDriven: row.newsDriven ?? false,
       })
       .where(eq(channels.id, row.id));
   }
