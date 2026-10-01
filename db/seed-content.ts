@@ -19,6 +19,9 @@ export type SeedIdea = {
   estimatedSeconds?: number;
   realAnswer?: string;
   fakeAnswer?: string;
+  handle?: string;
+  sourceUrl?: string;
+  notes?: string;
 };
 
 export const SEED_CONTENT: SeedIdea[] = [
@@ -155,5 +158,108 @@ And if your district's too quiet to say anything real yet, it tells you that, in
     title: q,
     realAnswer: real,
     fakeAnswer: fake,
+  })),
+
+  /* -------------------------------------------------------------- Reactions */
+  /*
+   * Every handle below was read off a live search result and the page it came
+   * from is recorded in `notes`. A guessed handle sends him to a dead profile
+   * and costs more trust than an empty list does, so unverified names are
+   * left out entirely rather than approximated.
+   */
+  ...(
+    [
+      {
+        handle: "@anniekknight",
+        url: "https://www.instagram.com/anniekknight/",
+        posts: "Australian OnlyFans creator, 285K followers, whose Instagram is a running feed of escalating stunt announcements and the fallout from them.",
+        why: "React to a stunt announcement and the comments under it. The reaction is the content — read the claim flat, then let your face do the work.",
+        found: "instagram.com/anniekknight, via search for the handle",
+      },
+      {
+        handle: "@sophieraiin",
+        url: "https://www.instagram.com/sophieraiin/",
+        posts: "9M followers. Bop House co-founder who went viral for announcing $43M in her first year on OnlyFans.",
+        why: "The earnings claims are the hook. React to the number, not the person — 'she made more than every doctor in this comment section' type framing.",
+        found: "instagram.com/sophieraiin and en.wikipedia.org/wiki/Sophie_Rain",
+      },
+      {
+        handle: "@realcamillaara",
+        url: "https://www.instagram.com/realcamillaara/",
+        posts: "6M followers, 3,788 posts. Ex-Bop House, now posting podcast clips and vlogs alongside the promo content.",
+        why: "The podcast clips are where the unhinged quotes live. Pull one quote, react to the quote.",
+        found: "instagram.com/realcamillaara and socialblade.com/instagram/user/realcamillaara",
+      },
+      {
+        handle: "@bophouse",
+        url: "https://www.instagram.com/bophouse/",
+        posts: "672K followers. The collective's brand account — group content, member announcements, arrivals and exits.",
+        why: "The membership churn is a storyline with no end. React to an arrival or an exit as if it were a sports trade.",
+        found: "en.wikipedia.org/wiki/Bop_House and instagram.com/bophouse",
+      },
+      {
+        handle: "@aishahsofey",
+        url: "https://www.instagram.com/aishahsofey/",
+        posts: "3.3M followers. Bop House co-founder, Miami-based, posting promo content and house footage.",
+        why: "Pairs with @bophouse — react to the two accounts telling the same story differently.",
+        found: "aishahssofey.com official links page and idolinsights.com/the-bop-house-members",
+      },
+      {
+        handle: "@lilyphillip_sofficial",
+        url: "https://www.instagram.com/lilyphillip_sofficial/",
+        posts: "British OnlyFans creator. This is the backup account (14K); the main one is reported as @lilyphillip_s but did not appear as a link in search, so only this one is listed.",
+        why: "The record-attempt announcements and the AI-clone-of-herself plan are both reactable without showing anything explicit.",
+        found: "instagram.com/lilyphillip_sofficial and ladbible.com article on her AI plan",
+      },
+      {
+        handle: "@barfly7777",
+        url: "https://www.instagram.com/barfly7777/",
+        posts: "126K followers. The 'bathroom chef' — cooks full meals in hotel bathrooms, once in an aeroplane bathroom.",
+        why: "Closest thing to a guaranteed reaction video on this list. Play it straight, let the footage be the joke.",
+        found: "instagram.com/barfly7777 and knowyourmeme.com/memes/people/barfly7777-bathroom-chef",
+      },
+      {
+        handle: "@my.janebrain",
+        url: "https://www.instagram.com/my.janebrain/",
+        posts: "472K followers. 'Just a girl in her kitchen' — food that should not be assembled the way she assembles it.",
+        why: "Texture reactions. Say nothing for the first three seconds and let the viewer get there first.",
+        found: "instagram.com/my.janebrain",
+      },
+      {
+        handle: "@cookingforbae",
+        url: "https://www.instagram.com/cookingforbae/",
+        posts: "Food made for a partner that looks like a threat. The original cursed-plating account.",
+        why: "Pure visual reaction. Works with no commentary at all if the plate is bad enough.",
+        found: "lafleministe.fr roundup of absurd Instagram accounts",
+      },
+      {
+        handle: "@pleasehatethesethings",
+        url: "https://www.instagram.com/pleasehatethesethings/",
+        posts: "583K followers. Absurd and ugly home design, pulled from real estate listings.",
+        why: "Switch the channel's tone — this one is dry, not loud. Good for a slower video between the louder ones.",
+        found: "instagram.com/pleasehatethesethings and houzz.com discussion thread",
+      },
+      {
+        handle: "@greaseball1987",
+        url: "https://www.instagram.com/greaseball1987/",
+        posts: "59K followers. Trevor Lahey, 'Certified Caulk Installer' — terrible construction work with deadpan captions.",
+        why: "The caption is already the joke, so react to the work instead and let the caption land second.",
+        found: "instagram.com/greaseball1987 and demilked.com feature on the account",
+      },
+      {
+        handle: "@influencersinthewild",
+        url: "https://www.instagram.com/influencersinthewild/",
+        posts: "5M followers. 'Where the creators ARE the content' — people filming themselves in public, filmed by strangers.",
+        why: "The biggest account on the list, so the clips are already familiar. Use it when you want reach rather than novelty.",
+        found: "instagram.com/influencersinthewild and embedded.substack.com piece on the account",
+      },
+    ] as const
+  ).map(({ handle, url, posts, why, found }) => ({
+    channelId: "reactions",
+    title: handle,
+    handle,
+    sourceUrl: url,
+    premise: posts,
+    notes: `${why}\n\nFound on: ${found}`,
   })),
 ];
