@@ -54,6 +54,9 @@ recording auto-edits it and writes the caption.
 - `db/channels.ts` — the three channel profiles. These drive everything the
   app writes; treat them as the product.
 - `lib/pool.ts` — keeps ten scripted ideas per account.
+- `lib/brief.ts` — the daily AI brief: three stories, three scripts, every
+  morning. `vercel.json` holds the timer, `/api/brief` is what it calls, and
+  `/brief` is the page.
 - `lib/video/` — transcribe, plan the cuts, render. `plan.ts` is pure and
   unit tested (`npm test`); the caption timing maths lives there.
 

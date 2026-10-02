@@ -1,0 +1,1 @@
+ALTER TABLE `items` ADD `brief_date` text;

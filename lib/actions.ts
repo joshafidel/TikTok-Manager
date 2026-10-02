@@ -7,7 +7,14 @@ import { and, eq, inArray } from "drizzle-orm";
 import { db, channels, items, clips, performance } from "@/db";
 import type { Status } from "@/db/schema";
 import { generateIdeas, generateScript, GenerationError } from "./claude";
-import { getChannel, getChannels, getClip, getItem, getRecentTitles, getTopPerformers } from "./queries";
+import {
+  getChannel,
+  getChannels,
+  getClip,
+  getItem,
+  getRecentTitles,
+  getTopPerformers,
+} from "./queries";
 import { todayISO } from "./dates";
 
 function now() {
@@ -103,7 +110,10 @@ export async function setStatus(fd: FormData) {
 export async function archiveItem(fd: FormData) {
   const id = str(fd, "id");
   if (!id) return;
-  await db.update(items).set({ archived: true, updatedAt: now() }).where(eq(items.id, id));
+  await db
+    .update(items)
+    .set({ archived: true, updatedAt: now() })
+    .where(eq(items.id, id));
   refreshAll();
 }
 
@@ -271,9 +281,30 @@ export async function clipToItem(fd: FormData) {
     createdAt: now(),
     updatedAt: now(),
   });
-  await db.update(clips).set({ status: "used", usedByItemId: itemId }).where(eq(clips.id, clipId));
+  await db
+    .update(clips)
+    .set({ status: "used", usedByItemId: itemId })
+    .where(eq(clips.id, clipId));
   refreshAll();
   redirect(`/items/${itemId}`);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Daily AI brief                                                             */
+/* -------------------------------------------------------------------------- */
+
+/** Runs today's scan from the brief page. The timer uses /api/brief instead. */
+export async function runBriefAction(
+  force = false,
+): Promise<{ error?: string }> {
+  try {
+    const { runDailyBrief } = await import("./brief");
+    const r = await runDailyBrief({ force });
+    refreshAll();
+    return r.error ? { error: r.error } : {};
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "The scan failed." };
+  }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -391,10 +422,16 @@ export async function ensurePoolAction(channelId: string): Promise<PoolResult> {
   }
 }
 
-export type ScriptBatchResult = { written: number; remaining: number; error?: string };
+export type ScriptBatchResult = {
+  written: number;
+  remaining: number;
+  error?: string;
+};
 
 /** Writes the next few scripts. The client repeats until nothing remains. */
-export async function writeScriptsAction(channelId: string): Promise<ScriptBatchResult> {
+export async function writeScriptsAction(
+  channelId: string,
+): Promise<ScriptBatchResult> {
   try {
     const { writeNextScripts } = await import("./pool");
     const r = await writeNextScripts(channelId);

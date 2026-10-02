@@ -8,7 +8,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "TikTok Manager",
   description: "Three channels, one calendar.",
-  appleWebApp: { capable: true, title: "Manager", statusBarStyle: "black-translucent" },
+  appleWebApp: {
+    capable: true,
+    title: "Manager",
+    statusBarStyle: "black-translucent",
+  },
 };
 
 export const viewport: Viewport = {
@@ -24,13 +28,18 @@ export const viewport: Viewport = {
 const NAV = [
   { href: "/", label: "Accounts" },
   { href: "/today", label: "Today" },
+  { href: "/brief", label: "AI Brief" },
   { href: "/calendar", label: "Calendar" },
   { href: "/pipeline", label: "Pipeline" },
   { href: "/clips", label: "Clips" },
   { href: "/channels", label: "Channels" },
 ];
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const password = process.env.APP_PASSWORD;
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   // Without a password the app is running unlocked on a laptop, so treat it as signed in.
@@ -40,7 +49,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin=""
+        />
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"

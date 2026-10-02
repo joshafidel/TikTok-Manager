@@ -111,6 +111,11 @@ export const items = sqliteTable("items", {
    * is housekeeping.
    */
   archivedReason: text("archived_reason").$type<"rejected" | "stale">(),
+  /**
+   * Set on the stories the daily AI scan writes, to the day it ran. The brief
+   * page groups by it; everything else treats these as ordinary ideas.
+   */
+  briefDate: text("brief_date"),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
 });
