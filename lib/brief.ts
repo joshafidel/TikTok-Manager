@@ -8,9 +8,9 @@ import { db, items } from "@/db";
 import type { Channel, Item } from "@/db/schema";
 import { ready } from "@/db/ready";
 import { generateScript } from "./claude";
-import { fromISODate, todayISO, type ISODate } from "./dates";
+import { addDays, fromISODate, todayISO, type ISODate } from "./dates";
 import { profileVersion } from "./profile-version";
-import { getChannel } from "./queries";
+import { getChannel, getRecentTitles } from "./queries";
 
 /**
  * The daily AI brief: the three biggest stories of the day, each with a
@@ -74,6 +74,7 @@ function shortDate(iso: string): string {
 async function findTopStories(
   channel: Channel,
   date: ISODate,
+  exclude: string[],
 ): Promise<BriefStory[]> {
   const research = await client().messages.create({
     model: MODEL,
@@ -85,7 +86,7 @@ async function findTopStories(
       {
         role: "user",
         content: [
-          `Today is ${date}. Search the web and find the three biggest AI stories of the last 24 hours. If the day is quiet, go back 48 hours, never further.`,
+          `Today is ${date}. Search the web and find the three biggest AI stories reported today or yesterday — nothing older. Search for yesterday's and today's dates by name, and for "this week" lists published today, so you see what is actually new.`,
           ``,
           `CHANNEL: ${channel.name}`,
           `WHAT IT COVERS: ${channel.mission}`,
@@ -100,6 +101,10 @@ async function findTopStories(
           `- Every story has a date. An undated story cannot be used.`,
           `- Prefer stories with a product, a filing, a price or a measurement in them over announcements of intent.`,
           `- Three different companies or topics. Not three angles on one story.`,
+          `- One event per story: a launch, a filing, a ruling, a result. Never a roundup, a trend piece or "several companies did X".`,
+          exclude.length
+            ? `- Already covered on this channel, skip these and anything that is the same story: ${exclude.join(" | ")}`
+            : ``,
           ``,
           `Report what you found as a plain list. No preamble.`,
         ].join("\n"),
@@ -115,6 +120,7 @@ async function findTopStories(
 
   if (!findings) return [];
 
+  const floor = addDays(date, -1);
   const structured = await client().messages.parse({
     model: MODEL,
     max_tokens: 6000,
@@ -127,13 +133,20 @@ async function findTopStories(
           ``,
           findings,
           ``,
-          `Use only what appears above. Do not add a story, a number or a date that is not there. Copy each URL exactly as written. If fewer than ${BRIEF_SIZE} stories are properly dated and sourced, return fewer.`,
+          `Use only what appears above. Do not add a story, a number or a date that is not there. Copy each URL exactly as written. Each story is one named event at one company — leave out roundups and trend pieces. Leave out anything reported before ${floor}. If fewer than ${BRIEF_SIZE} stories qualify, return fewer.`,
         ].join("\n"),
       },
     ],
   });
 
-  return structured.parsed_output?.stories.slice(0, BRIEF_SIZE) ?? [];
+  // The prompt asks for recent stories; this is what guarantees it. A story
+  // older than yesterday is not news, however good it is.
+  return (structured.parsed_output?.stories ?? [])
+    .filter(
+      (st) =>
+        /^\d{4}-\d{2}-\d{2}$/.test(st.reportedOn) && st.reportedOn >= floor,
+    )
+    .slice(0, BRIEF_SIZE);
 }
 
 /** The stories written on one day, in the order they were written. */
@@ -240,7 +253,11 @@ export async function runDailyBrief(
     return { date, stories: await getBrief(date), created: 0, scripted };
   }
 
-  const stories = await findTopStories(channel, date);
+  const stories = await findTopStories(
+    channel,
+    date,
+    await getRecentTitles(BRIEF_CHANNEL),
+  );
   const have = new Set(existing.map((e) => e.title));
   const fresh = stories.filter(
     (s) => !have.has(`${shortDate(s.reportedOn)} — ${s.headline}`),

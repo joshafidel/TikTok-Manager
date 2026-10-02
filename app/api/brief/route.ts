@@ -16,7 +16,8 @@ export async function GET(req: Request) {
   }
 
   try {
-    const result = await runDailyBrief();
+    const force = new URL(req.url).searchParams.get("force") === "1";
+    const result = await runDailyBrief({ force });
     return NextResponse.json({
       date: result.date,
       created: result.created,
