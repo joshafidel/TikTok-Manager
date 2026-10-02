@@ -253,11 +253,26 @@ export async function runDailyBrief(
     return { date, stories: await getBrief(date), created: 0, scripted };
   }
 
-  const stories = await findTopStories(
-    channel,
-    date,
-    await getRecentTitles(BRIEF_CHANNEL),
-  );
+  // A quiet day can come back short. One more pass, told what it already has,
+  // usually finds the next story down; a second miss is accepted as a short day.
+  const covered = [
+    ...(await getRecentTitles(BRIEF_CHANNEL)),
+    ...existing.map((e) => e.title),
+  ];
+  const stories: BriefStory[] = [];
+  for (
+    let pass = 0;
+    pass < 2 && existing.length + stories.length < BRIEF_SIZE;
+    pass++
+  ) {
+    const found = await findTopStories(channel, date, [
+      ...covered,
+      ...stories.map((st) => st.headline),
+    ]);
+    for (const st of found) {
+      if (!stories.some((x) => x.headline === st.headline)) stories.push(st);
+    }
+  }
   const have = new Set(existing.map((e) => e.title));
   const fresh = stories.filter(
     (s) => !have.has(`${shortDate(s.reportedOn)} — ${s.headline}`),
