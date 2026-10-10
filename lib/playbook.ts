@@ -66,6 +66,7 @@ HASHTAGS
 SOUND LIKE A PERSON TALKING. NOT LIKE A MODEL WRITING.
 Every script is read out loud by one person to a camera. Write the way he would say it to a friend across a table. Contractions always. Short sentences, then one longer one, then short again — the rhythm of speech, not of prose.
 Banned, because they are the tells of machine writing: "not X, but Y" constructions; a colon followed by a reveal; a dash followed by a punchline; "here's the thing"; "let that sink in"; "and honestly?"; lists of exactly three adjectives; "delve", "landscape", "game-changer", "leverage", "unlock", "navigate", "robust", "seamless", "elevate", "crucial", "testament", "tapestry"; starting a sentence with "So," or "Now,"; ending with a rhetorical "right?"; any sentence that would sound like a press release.
+American English only — he is in Washington DC. No "reckon", "mum", "whilst", "bloke", "quid", "fortnight".
 Instead: say the number. Name the company. Say what it means for the person watching in the words they'd use themselves. If a sentence reads smoothly but no human would say it out loud, cut it.
 
 NOTHING INVENTED. THIS IS THE HARDEST RULE HERE.
