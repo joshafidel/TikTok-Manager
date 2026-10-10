@@ -27,6 +27,7 @@ export async function pruneChannel(channel: Channel): Promise<number> {
       fromUser: items.fromUser,
       sourceUrl: items.sourceUrl,
       briefDate: items.briefDate,
+      createdAt: items.createdAt,
       profileVersion: items.profileVersion,
     })
     .from(items)
@@ -39,10 +40,17 @@ export async function pruneChannel(channel: Channel): Promise<number> {
   // the daily scan wrote it) is not cleared: the story is still true, only the
   // words are out of date, so it keeps its place and the script is rewritten.
   // An invented idea has nothing under it and goes.
+  // Only recent ones, though: a story from more than a week ago is not worth
+  // rewriting, because it is no longer news.
+  const cutoff = new Date(Date.now() - 7 * 86_400_000).toISOString();
   const grounded = (i: {
     sourceUrl: string | null;
     briefDate: string | null;
-  }) => channel.mode === "scripts" && (!!i.sourceUrl || !!i.briefDate);
+    createdAt: string;
+  }) =>
+    channel.mode === "scripts" &&
+    (!!i.sourceUrl || !!i.briefDate) &&
+    i.createdAt >= cutoff;
   const stale = live.filter(
     (i) => !i.fromUser && !grounded(i) && i.profileVersion !== version,
   );
