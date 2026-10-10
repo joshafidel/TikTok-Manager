@@ -183,7 +183,7 @@ export const CHANNEL_SEED = [
     handle: null,
     accent: "#2A62A8",
     mission:
-      "Break real AI news. Every video starts from an actual headline from the last few days, and every title opens with the date that story broke, so the age of the news is never in doubt. What happened, why it matters, and what the viewer should do about it. Credibility comes from being accurate, specific and fast about things that genuinely exist. This is the channel brands in the AI space pay to be next to, and the top of the funnel for Tally.",
+      "Break the big AI news. Every video starts from an actual headline from the last few days — the major companies and the real breakthroughs, the stories a normal person cares about, never the small stuff — and every title opens with the date that story broke, so the age of the news is never in doubt. What happened, why it matters, and what the viewer should do about it. Credibility comes from being accurate, specific and fast about things that genuinely exist. This is the channel brands in the AI space pay to be next to, and the top of the funnel for Tally.",
     audience:
       "Curious non-experts and early-career technical people who want to stay current without reading twenty newsletters. They feel behind, they are tired of hype and doom, and they can tell immediately when someone is describing something they have not actually used.",
     voice:
@@ -213,8 +213,16 @@ export const CHANNEL_SEED = [
       "",
       "The combination: Kallaway's structure, Dylan Page's energy, Will Francis's honesty. Fast and warm, built on curiosity loops, and never overselling what actually happened.",
       "",
+      "SCRIPT SHAPE — EVERY VIDEO, NO EXCEPTIONS",
+      "1. Open with one powerful, click-baity hook: a single sentence, the most alarming or surprising TRUE thing in the story. No throat-clearing, no 'so'.",
+      "2. Then, word for word: \"My name is Josh, I study AI at Georgetown University, and here's everything you need to know about what's going on in the AI tech world today.\"",
+      "3. The body is punchy. Short sentences. Easy, powerful words — 'cooked' not 'existential', 'the biggest ever' not 'unprecedented', 'they lost' not 'posted a deficit'. One idea per sentence. The numbers stay in; the jargon goes out. Keep the honest caveats, said plainly in one line.",
+      "4. Then one generic question that baits replies — 'What do you think? Are we cooked?' — different wording each time.",
+      '5. The last line, word for word: "Follow me for everything you need to know about AI, made simple."',
+      "The hook field is line 1. The loopLine field is line 5. Scripts that skip any of the five are wrong.",
+      "",
       "TITLES CARRY THE DATE.",
-      "Every title starts with the date the story broke, written short — \"Sep 29 — Anthropic's leaked prospectus\". Not the date you are recording, the date it was reported. A story you cannot date is a story you are not sure happened, so it does not get written.",
+      'Every title starts with the date the story broke, written short — "Sep 29 — Anthropic\'s leaked prospectus". Not the date you are recording, the date it was reported. A story you cannot date is a story you are not sure happened, so it does not get written.',
     ].join("\n"),
     scriptStyle: "full" as const,
     cadencePerWeek: 4,
@@ -288,7 +296,7 @@ export const CHANNEL_SEED = [
     productNotes: null,
     mode: "questions" as const,
     styleNotes:
-      "Every entry is written as a question, out loud, exactly as it is asked on the street — it ends in a question mark and it is short enough to say in one breath. Never a topic, never a statement, never an instruction to yourself. \"How many sides does a stop sign have?\" is the entry; \"stop sign sides\" is not.\n\nThe whole format lives in the pause. Ask, let them answer, and then do nothing for a full beat before you correct them — the silence is what makes the correction land and what makes the clip rewatchable. Shoot so their face is the subject, not yours: you can be off-camera entirely. Keep your own delivery low-energy; their reaction supplies all the energy the video needs.",
+      'Every entry is written as a question, out loud, exactly as it is asked on the street — it ends in a question mark and it is short enough to say in one breath. Never a topic, never a statement, never an instruction to yourself. "How many sides does a stop sign have?" is the entry; "stop sign sides" is not.\n\nThe whole format lives in the pause. Ask, let them answer, and then do nothing for a full beat before you correct them — the silence is what makes the correction land and what makes the clip rewatchable. Shoot so their face is the subject, not yours: you can be off-camera entirely. Keep your own delivery low-energy; their reaction supplies all the energy the video needs.',
     scriptStyle: "beats" as const,
     cadencePerWeek: 5,
     targetDepth: 8,
@@ -303,7 +311,7 @@ export const CHANNEL_SEED = [
     handle: null,
     accent: "#1F7A5C",
     mission:
-      "Market Tally. Open on a frustration the viewer already has about being ignored by the people who represent them — \"aren't you tired of your representatives not listening to you?\" — then show the app answering it on screen. The alignment score is the payoff almost every time, because it is the literal measurement of whether your rep votes the way your district actually thinks. Judged on installs and polls created, not views: a 4k-view video that converts beats a 90k-view video that does not.",
+      'Market Tally. Open on a frustration the viewer already has about being ignored by the people who represent them — "aren\'t you tired of your representatives not listening to you?" — then show the app answering it on screen. The alignment score is the payoff almost every time, because it is the literal measurement of whether your rep votes the way your district actually thinks. Judged on installs and polls created, not views: a 4k-view video that converts beats a 90k-view video that does not.',
     audience:
       "People who argue about local issues in group chats and comment sections and are quietly frustrated that it never resolves anything — nobody counts, the loudest person wins. Most of them have never heard of Tally and are not looking for an app.",
     voice:

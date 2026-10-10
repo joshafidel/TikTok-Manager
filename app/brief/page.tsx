@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getBrief, getBriefDates, BRIEF_CHANNEL } from "@/lib/brief";
 import { getChannel } from "@/lib/queries";
+import { profileVersion } from "@/lib/profile-version";
 import { formatLong, formatShort, todayISO } from "@/lib/dates";
 import { crossOffIdea } from "@/lib/actions";
 import { BriefRunner } from "@/components/brief-client";
@@ -26,7 +27,10 @@ export default async function BriefPage({
     getChannel(BRIEF_CHANNEL),
   ]);
   const isToday = date === today;
-  const missingScripts = stories.filter((s) => !s.script).length;
+  const version = channel ? profileVersion(channel) : null;
+  const missingScripts = stories.filter(
+    (s) => !s.script || s.profileVersion !== version,
+  ).length;
 
   return (
     <div className="flex flex-col gap-10">

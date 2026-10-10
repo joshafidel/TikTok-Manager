@@ -108,7 +108,9 @@ export default async function AccountPage({
           }
           staleCount={stale.length}
           missingScripts={
-            channel.mode === "scripts" ? pool.length - scripted.length : 0
+            channel.mode === "scripts"
+              ? pool.length - scripted.length + stale.length
+              : 0
           }
         />
 
@@ -205,7 +207,7 @@ export default async function AccountPage({
                         )}
                         {stale.some((x) => x.id === item.id) && (
                           <span className="label mt-1 block !text-[var(--tally)]">
-                            Written under older instructions — being replaced
+                            Written under older instructions — being rewritten
                           </span>
                         )}
 

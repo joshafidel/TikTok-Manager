@@ -92,7 +92,7 @@ async function findTopStories(
           `WHAT IT COVERS: ${channel.mission}`,
           `AUDIENCE: ${channel.audience}`,
           ``,
-          `Biggest means most consequential for an ordinary person — a launch they can use, a decision that changes what a company can do, a number that reframes the industry. Not the most hyped, and not opinion pieces.`,
+          `Biggest means the stories ordinary people would actually care about: the major players — OpenAI, Google, Anthropic, Meta, Microsoft, Apple, Nvidia, Amazon, xAI, Tesla — and genuine breakthroughs: a new model that beats the last one, a product millions will use, a deal or a number that changes the industry. Not funding rounds at startups nobody has heard of, not developer tooling, not policy chatter, not opinion pieces. If your mum would not understand why it matters in one sentence, it is not big enough.`,
           ``,
           `For each story give: what happened, with names and numbers; the date it was first reported; the outlet and the article URL; and one line on why it matters.`,
           ``,
@@ -129,7 +129,7 @@ async function findTopStories(
       {
         role: "user",
         content: [
-          `Here are research findings on today's AI news. Turn them into exactly the ${BRIEF_SIZE} biggest stories, most consequential first.`,
+          `Here are research findings on today's AI news. Turn them into exactly the ${BRIEF_SIZE} biggest stories, biggest first — the major companies and real breakthroughs, the things a normal person would care about. Drop small-company funding, developer tooling and policy chatter.`,
           ``,
           findings,
           ``,
@@ -184,9 +184,11 @@ export async function getBriefDates(limit = 14): Promise<ISODate[]> {
 }
 
 async function writeScripts(channel: Channel, rows: Item[]): Promise<number> {
+  const version = profileVersion(channel);
   const results = await Promise.allSettled(
     rows
-      .filter((r) => !r.script)
+      // Missing, or written under rules that have since changed.
+      .filter((r) => !r.script || r.profileVersion !== version)
       .map(async (item) => {
         const script = await generateScript({ channel, item });
         await db
@@ -199,6 +201,7 @@ async function writeScripts(channel: Channel, rows: Item[]): Promise<number> {
             caption: script.caption,
             hashtags: script.hashtags.join(" "),
             status: "scripted",
+            profileVersion: version,
             updatedAt: new Date().toISOString(),
           })
           .where(eq(items.id, item.id));

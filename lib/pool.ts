@@ -27,25 +27,27 @@ const now = () => new Date().toISOString();
 export async function getPool(channelId: string): Promise<Item[]> {
   await ready();
   const channel = await getChannel(channelId);
-  if (channel) await pruneChannel(channelId, profileVersion(channel));
+  if (channel) await pruneChannel(channel);
   return readPool(channelId);
 }
 
 /** The same read without the clear-out, for callers that have just done one. */
 async function readPool(channelId: string): Promise<Item[]> {
-  return db
-    .select()
-    .from(items)
-    .where(
-      and(
-        eq(items.channelId, channelId),
-        eq(items.archived, false),
-        inArray(items.status, ["idea", "scripted"]),
-      ),
-    )
-    // Your own ideas first — you asked for those, the rest are suggestions.
-    .orderBy(desc(items.fromUser), asc(items.createdAt))
-    .limit(POOL_SIZE * 2);
+  return (
+    db
+      .select()
+      .from(items)
+      .where(
+        and(
+          eq(items.channelId, channelId),
+          eq(items.archived, false),
+          inArray(items.status, ["idea", "scripted"]),
+        ),
+      )
+      // Your own ideas first — you asked for those, the rest are suggestions.
+      .orderBy(desc(items.fromUser), asc(items.createdAt))
+      .limit(POOL_SIZE * 2)
+  );
 }
 
 /** Tops the pool back up to POOL_SIZE. Ideas only — scripts follow in batches. */
@@ -54,7 +56,7 @@ export async function ensurePool(channelId: string, target = POOL_SIZE) {
   if (!channel) return { added: 0, error: "Channel not found." };
 
   const version = profileVersion(channel);
-  const dropped = await pruneChannel(channelId, version);
+  const dropped = await pruneChannel(channel);
 
   const pool = await readPool(channelId);
   const missing = target - pool.length;
@@ -91,7 +93,9 @@ export async function ensurePool(channelId: string, target = POOL_SIZE) {
     const found = await findSources({
       channel,
       count: missing,
-      existing: pool.map((p) => p.handle ?? p.title).filter(Boolean) as string[],
+      existing: pool
+        .map((p) => p.handle ?? p.title)
+        .filter(Boolean) as string[],
     });
     if (!found.length) return { added: 0, dropped };
 
@@ -180,16 +184,47 @@ export async function unscripted(channelId: string): Promise<Item[]> {
 }
 
 /**
+ * Scripts written under rules that have since changed. The story stands; the
+ * words get redone to the current rules, without anyone opening each one.
+ */
+export async function needsRewrite(
+  channelId: string,
+  version: string,
+): Promise<Item[]> {
+  await ready();
+  const rows = await db
+    .select()
+    .from(items)
+    .where(
+      and(
+        eq(items.channelId, channelId),
+        eq(items.archived, false),
+        inArray(items.status, ["idea", "scripted"]),
+      ),
+    )
+    .orderBy(asc(items.createdAt));
+  return rows.filter((r) => !!r.script && r.profileVersion !== version);
+}
+
+/**
  * Writes the next few scripts. The caller repeats until `remaining` is 0, which
  * keeps every individual request well inside the function time limit.
  */
-export async function writeNextScripts(channelId: string, batch = SCRIPT_BATCH) {
+export async function writeNextScripts(
+  channelId: string,
+  batch = SCRIPT_BATCH,
+) {
   const channel = await getChannel(channelId);
-  if (!channel) return { written: 0, remaining: 0, error: "Channel not found." };
+  if (!channel)
+    return { written: 0, remaining: 0, error: "Channel not found." };
 
   if (channel.mode !== "scripts") return { written: 0, remaining: 0 };
 
-  const pending = await unscripted(channelId);
+  const version = profileVersion(channel);
+  const pending = [
+    ...(await unscripted(channelId)),
+    ...(await needsRewrite(channelId, version)),
+  ];
   if (!pending.length) return { written: 0, remaining: 0 };
 
   const slice = pending.slice(0, batch);
@@ -207,6 +242,7 @@ export async function writeNextScripts(channelId: string, batch = SCRIPT_BATCH) 
           caption: script.caption,
           hashtags: script.hashtags.join(" "),
           status: "scripted",
+          profileVersion: version,
           updatedAt: now(),
         })
         .where(eq(items.id, item.id));
@@ -214,12 +250,16 @@ export async function writeNextScripts(channelId: string, batch = SCRIPT_BATCH) 
   );
 
   const written = results.filter((r) => r.status === "fulfilled").length;
-  const failure = results.find((r) => r.status === "rejected") as PromiseRejectedResult | undefined;
+  const failure = results.find((r) => r.status === "rejected") as
+    | PromiseRejectedResult
+    | undefined;
 
   return {
     written,
     remaining: Math.max(0, pending.length - written),
     // Surface one failure rather than looping forever on a script that won't write.
-    error: failure ? String(failure.reason?.message ?? failure.reason) : undefined,
+    error: failure
+      ? String(failure.reason?.message ?? failure.reason)
+      : undefined,
   };
 }

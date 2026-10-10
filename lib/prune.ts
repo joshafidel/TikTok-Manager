@@ -1,5 +1,6 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { db, channels, items } from "@/db";
+import type { Channel } from "@/db/schema";
 import { profileVersion } from "./profile-version";
 
 /**
@@ -18,24 +19,42 @@ import { profileVersion } from "./profile-version";
  *
  * Ideas typed in by hand are kept. Those are the user's, not ours.
  */
-export async function pruneChannel(channelId: string, version: string): Promise<number> {
+export async function pruneChannel(channel: Channel): Promise<number> {
+  const version = profileVersion(channel);
   const live = await db
     .select({
       id: items.id,
       fromUser: items.fromUser,
+      sourceUrl: items.sourceUrl,
+      briefDate: items.briefDate,
       profileVersion: items.profileVersion,
     })
     .from(items)
-    .where(and(eq(items.channelId, channelId), eq(items.archived, false)));
+    .where(and(eq(items.channelId, channel.id), eq(items.archived, false)));
 
   // A null stamp means it predates versioning, which makes it older than any
   // current profile — not exempt from being cleared.
-  const stale = live.filter((i) => !i.fromUser && i.profileVersion !== version);
+  //
+  // On a scripts channel, an entry built on a real story (it has a source, or
+  // the daily scan wrote it) is not cleared: the story is still true, only the
+  // words are out of date, so it keeps its place and the script is rewritten.
+  // An invented idea has nothing under it and goes.
+  const grounded = (i: {
+    sourceUrl: string | null;
+    briefDate: string | null;
+  }) => channel.mode === "scripts" && (!!i.sourceUrl || !!i.briefDate);
+  const stale = live.filter(
+    (i) => !i.fromUser && !grounded(i) && i.profileVersion !== version,
+  );
   if (!stale.length) return 0;
 
   await db
     .update(items)
-    .set({ archived: true, archivedReason: "stale", updatedAt: new Date().toISOString() })
+    .set({
+      archived: true,
+      archivedReason: "stale",
+      updatedAt: new Date().toISOString(),
+    })
     .where(
       inArray(
         items.id,
@@ -51,7 +70,7 @@ export async function pruneAllChannels(): Promise<number> {
   const all = await db.select().from(channels);
   let dropped = 0;
   for (const channel of all) {
-    dropped += await pruneChannel(channel.id, profileVersion(channel));
+    dropped += await pruneChannel(channel);
   }
   return dropped;
 }
